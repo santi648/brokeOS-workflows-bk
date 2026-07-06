@@ -1,0 +1,746 @@
+{
+  "updatedAt": "2026-06-23T00:21:18.501Z",
+  "createdAt": "2026-05-25T20:47:37.019Z",
+  "id": "ZrfEQTEM1xJmRuEJ",
+  "name": "guardarLoginsMarcadosRedis",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "loginsMarcados",
+        "value": "={{ JSON.stringify($json.logins) }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        80
+      ],
+      "id": "51f5a0b6-e276-4773-9a60-a74ba09035fe",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/admin/mt5-account-followups",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        80
+      ],
+      "id": "24f7efd8-e6ea-4e60-b26d-3e6582e3a918",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        80
+      ],
+      "name": "Call integridadDatos",
+      "id": "93f224d3-3c94-4233-af11-c19c9a3baf13"
+    },
+    {
+      "parameters": {
+        "url": "=https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-account-followups",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('getAccessToken').item.json.propertyName }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        688,
+        80
+      ],
+      "id": "871e56a2-3804-40da-9798-9bb481f12b54",
+      "name": "getFollowups"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        16,
+        80
+      ],
+      "id": "1db0fa7d-b738-48cd-88d3-29ffdf693a01",
+      "name": "getAccessToken",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst logins = items.flatMap(item => \n  item.json.data.items.map(i => i.mt_login)\n);\n\nreturn [{ json: { logins } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        80
+      ],
+      "id": "95f853e0-253c-4283-9bdc-82f6ecdbda27",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.propertyName;\nconst logins = new Set(JSON.parse(raw));\nconst loginAConsultar = $('Edit Fields').first().json.login;\n\n// Probar ambos tipos\nconst marcado = logins.has(loginAConsultar) || logins.has(Number(loginAConsultar));\n\nreturn [{ json: { marcado } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        304
+      ],
+      "id": "08f74dff-0001-4c64-8710-2022d716b5e3",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a5387374-f746-4390-8e61-a1f072859d41",
+              "name": "login",
+              "value": "100170",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        304
+      ],
+      "id": "64bb53d2-82b4-4cf8-a39a-1f14936727e1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "loginsMarcados",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        16,
+        304
+      ],
+      "id": "65813141-b338-47a1-8409-2da9d52c1de1",
+      "name": "getLoginMarcados",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "39ce6b2a-72be-4c25-98e7-4ad4132be561",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        448
+      ],
+      "id": "05894d52-2139-4ad5-99c0-6bafc6de091a",
+      "name": "Schedule Trigger1"
+    }
+  ],
+  "connections": {
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "getFollowups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getAccessToken": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getFollowups": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "getLoginMarcados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getLoginMarcados": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "getAccessToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    },
+    "node:Schedule Trigger1": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-06-22T19:20:20.003-05:00",
+          "Readable date": "June 22nd 2026, 7:20:20 pm",
+          "Readable time": "7:20:20 pm",
+          "Day of week": "Monday",
+          "Year": "2026",
+          "Month": "June",
+          "Day of month": "22",
+          "Hour": "19",
+          "Minute": "20",
+          "Second": "20",
+          "Timezone": "America/Bogota (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "f840b621-b7a1-4554-b9eb-d5265a22be06",
+  "activeVersionId": "f840b621-b7a1-4554-b9eb-d5265a22be06",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-05-25T20:47:37.019Z",
+      "createdAt": "2026-05-25T20:47:37.019Z",
+      "role": "workflow:owner",
+      "workflowId": "ZrfEQTEM1xJmRuEJ",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-23T00:19:21.505Z",
+    "createdAt": "2026-06-23T00:19:19.898Z",
+    "versionId": "f840b621-b7a1-4554-b9eb-d5265a22be06",
+    "workflowId": "ZrfEQTEM1xJmRuEJ",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "loginsMarcados",
+          "value": "={{ JSON.stringify($json.logins) }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          80
+        ],
+        "id": "51f5a0b6-e276-4773-9a60-a74ba09035fe",
+        "name": "Redis",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d32afad5-755a-4d9f-b105-140afb230324",
+                "name": "path",
+                "value": "=/api/v1/admin/mt5-account-followups",
+                "type": "string"
+              },
+              {
+                "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+                "name": "body_json",
+                "value": "=",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          240,
+          80
+        ],
+        "id": "24f7efd8-e6ea-4e60-b26d-3e6582e3a918",
+        "name": "path"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hNkfZRxj5g8aESFu",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+            "cachedResultName": "integridadDatos"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          464,
+          80
+        ],
+        "name": "Call integridadDatos",
+        "id": "93f224d3-3c94-4233-af11-c19c9a3baf13"
+      },
+      {
+        "parameters": {
+          "url": "=https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-account-followups",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('getAccessToken').item.json.propertyName }}"
+              },
+              {
+                "name": "X-Timestamp",
+                "value": "={{ $json[\"X-Timestamp\"] }}"
+              },
+              {
+                "name": "X-Nonce",
+                "value": "={{ $json[\"X-Nonce\"] }}"
+              },
+              {
+                "name": "X-Signature",
+                "value": "={{ $json[\"X-Signature\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          688,
+          80
+        ],
+        "id": "871e56a2-3804-40da-9798-9bb481f12b54",
+        "name": "getFollowups"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "accessToken",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          16,
+          80
+        ],
+        "id": "1db0fa7d-b738-48cd-88d3-29ffdf693a01",
+        "name": "getAccessToken",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nconst logins = items.flatMap(item => \n  item.json.data.items.map(i => i.mt_login)\n);\n\nreturn [{ json: { logins } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          80
+        ],
+        "id": "95f853e0-253c-4283-9bdc-82f6ecdbda27",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "jsCode": "const raw = $input.first().json.propertyName;\nconst logins = new Set(JSON.parse(raw));\nconst loginAConsultar = $('Edit Fields').first().json.login;\n\n// Probar ambos tipos\nconst marcado = logins.has(loginAConsultar) || logins.has(Number(loginAConsultar));\n\nreturn [{ json: { marcado } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          304
+        ],
+        "id": "08f74dff-0001-4c64-8710-2022d716b5e3",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "a5387374-f746-4390-8e61-a1f072859d41",
+                "name": "login",
+                "value": "100170",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -208,
+          304
+        ],
+        "id": "64bb53d2-82b4-4cf8-a39a-1f14936727e1",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "loginsMarcados",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          16,
+          304
+        ],
+        "id": "65813141-b338-47a1-8409-2da9d52c1de1",
+        "name": "getLoginMarcados",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "seconds",
+                "secondsInterval": 20
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -208,
+          80
+        ],
+        "id": "39ce6b2a-72be-4c25-98e7-4ad4132be561",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          160,
+          448
+        ],
+        "id": "05894d52-2139-4ad5-99c0-6bafc6de091a",
+        "name": "Schedule Trigger1"
+      }
+    ],
+    "connections": {
+      "path": {
+        "main": [
+          [
+            {
+              "node": "Call integridadDatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call integridadDatos": {
+        "main": [
+          [
+            {
+              "node": "getFollowups",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getAccessToken": {
+        "main": [
+          [
+            {
+              "node": "path",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getFollowups": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Redis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          []
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "getLoginMarcados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getLoginMarcados": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "getAccessToken",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version f840b621",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
