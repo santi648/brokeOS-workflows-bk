@@ -1,0 +1,580 @@
+{
+  "updatedAt": "2026-05-28T01:11:10.774Z",
+  "createdAt": "2026-05-12T07:05:14.517Z",
+  "id": "C9TE9wW7YdDcQ3hf",
+  "name": "websocketDeals",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageWS"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        -448
+      ],
+      "id": "878c916a-9cb4-4cf2-8b3c-229055624c63",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0lCBqR0bIVBKfb4T",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/0lCBqR0bIVBKfb4T",
+          "cachedResultName": "userConnections"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $('Switch').item.json.message.login }}"
+          },
+          "matchingColumns": [
+            "message_login"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        -352
+      ],
+      "name": "Call usersMqid1",
+      "id": "66a2541b-ec77-4a56-a8e7-2134794f47a3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Hq46rNTRMHr2BAjM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Hq46rNTRMHr2BAjM",
+          "cachedResultName": "loginsMarcados"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $('Switch').item.json.message.login }}",
+            "action_string": "={{ $json.message.action_string }}",
+            "lots": "={{ $json.message.lots }}",
+            "symbols": "={{ $json.message.symbol }}"
+          },
+          "matchingColumns": [
+            "message_login"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action_string",
+              "displayName": "action_string",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "lots",
+              "displayName": "lots",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "symbols",
+              "displayName": "symbols",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        -544
+      ],
+      "name": "Call loginsMarcados",
+      "id": "b2594758-eac9-46a9-87a1-e6fe199bfcef"
+    },
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/deals?fmt=json",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "xat",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshEnabled": true,
+        "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+        "tokenRefreshHeaders": {
+          "headers": [
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshFormFields": {
+          "fields": [
+            {
+              "name": "tipo",
+              "value": "Websockets"
+            },
+            {
+              "name": "ttl_hours",
+              "value": "12"
+            }
+          ]
+        },
+        "tokenRefreshResponsePath": "new_token",
+        "reconnectInterval": 1,
+        "maxReconnectAttempts": 5
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        -480
+      ],
+      "id": "04f61c56-a7f2-40c4-83d8-abae55d10259",
+      "name": "WebSocket Reconnect"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Call usersMqid1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call loginsMarcados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call loginsMarcados": {
+      "main": [
+        []
+      ]
+    },
+    "WebSocket Reconnect": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "e9aab890-3766-4fcb-9636-6efcbeda3356",
+  "activeVersionId": "e9aab890-3766-4fcb-9636-6efcbeda3356",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T07:05:14.517Z",
+      "createdAt": "2026-05-12T07:05:14.517Z",
+      "role": "workflow:owner",
+      "workflowId": "C9TE9wW7YdDcQ3hf",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-04T19:38:49.568Z",
+    "createdAt": "2026-05-28T01:08:55.225Z",
+    "versionId": "e9aab890-3766-4fcb-9636-6efcbeda3356",
+    "workflowId": "C9TE9wW7YdDcQ3hf",
+    "nodes": [
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "open",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageOpenWS"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "message",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageWS"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -352,
+          -448
+        ],
+        "id": "878c916a-9cb4-4cf2-8b3c-229055624c63",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "0lCBqR0bIVBKfb4T",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/0lCBqR0bIVBKfb4T",
+            "cachedResultName": "userConnections"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "message_login": "={{ $('Switch').item.json.message.login }}"
+            },
+            "matchingColumns": [
+              "message_login"
+            ],
+            "schema": [
+              {
+                "id": "message_login",
+                "displayName": "message_login",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {
+            "waitForSubWorkflow": false
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          -128,
+          -352
+        ],
+        "name": "Call usersMqid1",
+        "id": "66a2541b-ec77-4a56-a8e7-2134794f47a3"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "Hq46rNTRMHr2BAjM",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/Hq46rNTRMHr2BAjM",
+            "cachedResultName": "loginsMarcados"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "message_login": "={{ $('Switch').item.json.message.login }}",
+              "action_string": "={{ $json.message.action_string }}",
+              "lots": "={{ $json.message.lots }}",
+              "symbols": "={{ $json.message.symbol }}"
+            },
+            "matchingColumns": [
+              "message_login"
+            ],
+            "schema": [
+              {
+                "id": "message_login",
+                "displayName": "message_login",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "action_string",
+                "displayName": "action_string",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              },
+              {
+                "id": "lots",
+                "displayName": "lots",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              },
+              {
+                "id": "symbols",
+                "displayName": "symbols",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "string",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {
+            "waitForSubWorkflow": false
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          -128,
+          -544
+        ],
+        "name": "Call loginsMarcados",
+        "id": "b2594758-eac9-46a9-87a1-e6fe199bfcef"
+      },
+      {
+        "parameters": {
+          "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/deals?fmt=json",
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "xat",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshEnabled": true,
+          "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+          "tokenRefreshHeaders": {
+            "headers": [
+              {
+                "name": "X-Admin-Token",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshFormFields": {
+            "fields": [
+              {
+                "name": "tipo",
+                "value": "Websockets"
+              },
+              {
+                "name": "ttl_hours",
+                "value": "12"
+              }
+            ]
+          },
+          "tokenRefreshResponsePath": "new_token",
+          "reconnectInterval": 1,
+          "maxReconnectAttempts": 5
+        },
+        "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+        "typeVersion": 1,
+        "position": [
+          -608,
+          -480
+        ],
+        "id": "04f61c56-a7f2-40c4-83d8-abae55d10259",
+        "name": "WebSocket Reconnect"
+      }
+    ],
+    "connections": {
+      "Switch": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Call usersMqid1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Call loginsMarcados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call loginsMarcados": {
+        "main": [
+          []
+        ]
+      },
+      "WebSocket Reconnect": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version e9aab890",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
