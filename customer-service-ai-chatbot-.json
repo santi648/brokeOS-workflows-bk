@@ -1,0 +1,180 @@
+{
+  "updatedAt": "2026-05-11T07:55:56.636Z",
+  "createdAt": "2026-05-11T07:52:59.818Z",
+  "id": "0lFZnhNXHFDadm8n",
+  "name": "Customer Service AI Chatbot",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-1",
+      "name": "Customer Chat Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        112,
+        112
+      ],
+      "webhookId": "49ff4dc8-9cde-409c-94ef-44739cee8add"
+    },
+    {
+      "parameters": {
+        "agent": "toolsAgent",
+        "options": {
+          "systemMessage": "You are a helpful customer service assistant. Use the provided tools to answer user queries. Today is {{$now}}."
+        }
+      },
+      "id": "node-2",
+      "name": "AI Customer Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        392,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "node-3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        336,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "sessionKey": "={{$json.sessionId}}",
+        "contextWindowLength": 10
+      },
+      "id": "node-4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1,
+      "position": [
+        464,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://api.example.com/orders/{{orderId}}"
+      },
+      "id": "node-5",
+      "name": "Order Lookup Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1,
+      "position": [
+        592,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify({ reply: $json.output })}}",
+        "options": {}
+      },
+      "id": "node-6",
+      "name": "Respond To Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        800,
+        112
+      ]
+    }
+  ],
+  "connections": {
+    "Customer Chat Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Customer Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Customer Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond To Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Customer Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Customer Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Order Lookup Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Customer Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "b02ba61f-1738-4727-ac3c-9352e32c648a",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T07:52:59.818Z",
+      "createdAt": "2026-05-11T07:52:59.818Z",
+      "role": "workflow:owner",
+      "workflowId": "0lFZnhNXHFDadm8n",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
