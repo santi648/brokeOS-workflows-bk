@@ -1,0 +1,193 @@
+{
+  "updatedAt": "2026-05-25T13:14:15.702Z",
+  "createdAt": "2026-05-19T15:17:03.866Z",
+  "id": "b5ONobtZAvBROLKx",
+  "name": "loginsMarcados",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "curlImport": "",
+        "method": "GET",
+        "url": "=https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-account-followups?skip=0&limit=20&search={{ $('Start').item.json.message_login }}",
+        "authentication": "none",
+        "provideSslCertificates": false,
+        "sendQuery": false,
+        "sendHeaders": true,
+        "specifyHeaders": "keypair",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Call accessTokenApiKey').item.json.data_access_token }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "sendBody": false,
+        "options": {},
+        "infoMessage": ""
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1008,
+        -400
+      ],
+      "id": "9d4f88d2-52f3-4266-aaa2-c3961473bcc3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "call_workflow",
+        "source": "database",
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "once",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        784,
+        -400
+      ],
+      "name": "Call integridadDatos",
+      "id": "68fc2534-1456-4dc1-9db4-748fe151d9c7"
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/admin/mt5-account-followups",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -400
+      ],
+      "id": "96462465-4b63-42ae-b49a-056af7e11634",
+      "name": "path"
+    },
+    {
+      "id": "6a71228d-f75c-464c-99d2-1cfec4b60a3f",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        352,
+        -400
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_login",
+              "type": "any"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "36914cf6-c1a3-4ea5-947c-626a14e42139",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-19T15:17:03.866Z",
+      "createdAt": "2026-05-19T15:17:03.866Z",
+      "role": "workflow:owner",
+      "workflowId": "b5ONobtZAvBROLKx",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
