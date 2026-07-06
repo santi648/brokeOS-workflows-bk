@@ -1,0 +1,52 @@
+{
+  "updatedAt": "2026-04-21T15:36:20.239Z",
+  "createdAt": "2026-04-15T17:20:05.484Z",
+  "id": "VhnEV6pQmMceyBCS",
+  "name": "My workflow 7",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://stream.binance.com:9443/ws/btcusdt@trade"
+      },
+      "type": "n8n-nodes-websocket-ws.websocketTrigger",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -64
+      ],
+      "id": "fd8ae3bb-c28e-4ce5-84db-311c8fe9337a",
+      "name": "Websocket Connection & Message"
+    }
+  ],
+  "connections": {
+    "Websocket Connection & Message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "c6fa59cc-e2f2-48d4-ad7f-f0221d88ae8c",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T17:20:05.484Z",
+      "createdAt": "2026-04-15T17:20:05.484Z",
+      "role": "workflow:owner",
+      "workflowId": "VhnEV6pQmMceyBCS",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
