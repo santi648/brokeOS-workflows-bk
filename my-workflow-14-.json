@@ -1,0 +1,157 @@
+{
+  "updatedAt": "2026-06-01T14:57:01.792Z",
+  "createdAt": "2026-05-04T07:24:29.587Z",
+  "id": "dzJFYUAJZjL2qzZ0",
+  "name": "My workflow 14",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/ticks?token=hSG.Oi*Ra0uX-*ZuInC:SU~FthS3TIX3SrWn9eU06E*ZAJLUpbP2q~TV~WDp2E.sEuOzwy5D~8L._Y~ojHZBSfv2t30E!A-~eREgLAm~NpD7K3bgr5aUS~4.5iRqTceL"
+      },
+      "type": "n8n-nodes-websocket-ws.websocketTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "fc086cf0-a557-42a1-a545-c9867ea47f7e",
+      "name": "Websocket Connection & Message"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5Lh2Qnh3N9SnkVbf",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5Lh2Qnh3N9SnkVbf",
+          "cachedResultName": "My Sub-workflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_k_o": "={{ $json.message.DatetimeMsc }}"
+          },
+          "matchingColumns": [
+            "message_k_o"
+          ],
+          "schema": [
+            {
+              "id": "message_k_o",
+              "displayName": "message_k_o",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        -176
+      ],
+      "id": "6844d825-7740-4f23-bbaf-4617722c58d6",
+      "name": "Call 'My Sub-workflow'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wewebYAkv4Pv93Sk",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wewebYAkv4Pv93Sk",
+          "cachedResultName": "My Sub-Workflow 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        240
+      ],
+      "id": "c9ecd211-cfa6-43ed-96d5-0f8f7047af34",
+      "name": "Call 'My Sub-workflow'1"
+    }
+  ],
+  "connections": {
+    "Websocket Connection & Message": {
+      "main": [
+        [
+          {
+            "node": "Call 'My Sub-workflow'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call 'My Sub-workflow'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "Websocket Connection & Message": [
+      {
+        "json": {
+          "event": "message",
+          "message": {
+            "type": "tick",
+            "Symbol": "Crash 1000 Index",
+            "Datetime": 1777908608,
+            "DatetimeMsc": 1777908608241,
+            "Bid": 5575.1769,
+            "Ask": 5575.6831,
+            "Last": 0,
+            "VolumeExt": 0,
+            "Flags": 14
+          },
+          "ws": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "ce51b9ea-9c2e-41aa-8c31-72f01ba84ad3",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-04T07:24:29.587Z",
+      "createdAt": "2026-05-04T07:24:29.587Z",
+      "role": "workflow:owner",
+      "workflowId": "dzJFYUAJZjL2qzZ0",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
