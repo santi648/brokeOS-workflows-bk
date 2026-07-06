@@ -1,0 +1,289 @@
+{
+  "updatedAt": "2026-05-22T15:58:00.195Z",
+  "createdAt": "2026-05-15T11:36:02.961Z",
+  "id": "hNkfZRxj5g8aESFu",
+  "name": "integridadDatos",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "action": "generate"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        -368
+      ],
+      "id": "adcdfbcd-578d-4cca-8889-e7131aa0bc58",
+      "name": "X-Nonce(uuid)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "451bec8f-59b4-4b8a-8e6c-1d44cdb26b97",
+              "name": "path",
+              "value": "={{ $json.path }}",
+              "type": "string"
+            },
+            {
+              "id": "961c658b-8a69-40e9-adfe-1e557ccbbcc5",
+              "name": "X-Timestamp",
+              "value": "={{ $now.toMillis() }}",
+              "type": "string"
+            },
+            {
+              "id": "613d757a-0bdd-461d-9c12-0d31dac62290",
+              "name": "X-Nonce",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "35aa695e-9b24-4def-a5d0-a47428b81169",
+              "name": "body_json",
+              "value": "={{ $json.body_json }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -368
+      ],
+      "id": "87c0c24a-83ba-4063-aef8-131d3d09d91c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "value": "={{$json.path + $json[\"X-Timestamp\"] +$json[\"X-Nonce\"] +  $json.body_json}}",
+        "dataPropertyName": "X-Signature"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -368
+      ],
+      "id": "29a5cd75-a54c-42a2-8161-7f65185c0bb8",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "751e7681-8022-446e-b285-2a3051047550",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -384,
+        -368
+      ]
+    }
+  ],
+  "connections": {
+    "X-Nonce(uuid)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "X-Nonce(uuid)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "Start": [
+      {
+        "json": {
+          "path": "/api/v1/auth/api-key/session",
+          "body_json": "{\"api_key\":\"bk_pQgOCkpH-st00zb-_sKWlxQdaOAFgM-KCr95KiPP1og\"}"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "6f796384-1a04-4c75-9ac0-1ad97e06cd0c",
+  "activeVersionId": "6f796384-1a04-4c75-9ac0-1ad97e06cd0c",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-15T11:36:02.961Z",
+      "createdAt": "2026-05-15T11:36:02.961Z",
+      "role": "workflow:owner",
+      "workflowId": "hNkfZRxj5g8aESFu",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-15T12:10:02.897Z",
+    "createdAt": "2026-05-15T12:09:54.347Z",
+    "versionId": "6f796384-1a04-4c75-9ac0-1ad97e06cd0c",
+    "workflowId": "hNkfZRxj5g8aESFu",
+    "nodes": [
+      {
+        "parameters": {
+          "action": "generate"
+        },
+        "type": "n8n-nodes-base.crypto",
+        "typeVersion": 2,
+        "position": [
+          -176,
+          -368
+        ],
+        "id": "adcdfbcd-578d-4cca-8889-e7131aa0bc58",
+        "name": "X-Nonce(uuid)"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "451bec8f-59b4-4b8a-8e6c-1d44cdb26b97",
+                "name": "path",
+                "value": "={{ $json.path }}",
+                "type": "string"
+              },
+              {
+                "id": "961c658b-8a69-40e9-adfe-1e557ccbbcc5",
+                "name": "X-Timestamp",
+                "value": "={{ $now.toMillis() }}",
+                "type": "string"
+              },
+              {
+                "id": "613d757a-0bdd-461d-9c12-0d31dac62290",
+                "name": "X-Nonce",
+                "value": "={{ $json.data }}",
+                "type": "string"
+              },
+              {
+                "id": "35aa695e-9b24-4def-a5d0-a47428b81169",
+                "name": "body_json",
+                "value": "={{ $json.body_json }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          48,
+          -368
+        ],
+        "id": "87c0c24a-83ba-4063-aef8-131d3d09d91c",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "value": "={{$json.path + $json[\"X-Timestamp\"] +$json[\"X-Nonce\"] +  $json.body_json}}",
+          "dataPropertyName": "X-Signature"
+        },
+        "type": "n8n-nodes-base.crypto",
+        "typeVersion": 2,
+        "position": [
+          272,
+          -368
+        ],
+        "id": "29a5cd75-a54c-42a2-8161-7f65185c0bb8",
+        "name": "Crypto"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "id": "751e7681-8022-446e-b285-2a3051047550",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -384,
+          -368
+        ]
+      }
+    ],
+    "connections": {
+      "X-Nonce(uuid)": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Crypto",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "X-Nonce(uuid)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 6f796384",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
