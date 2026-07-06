@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2026-06-23T09:00:02.241Z",
+  "createdAt": "2026-04-23T15:22:38.115Z",
+  "id": "noijKxocBgxYsehq",
+  "name": "pruebaAPI",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://crypto-wallet-server.mock.beeceptor.com/api/v1/exchange_rates",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        16
+      ],
+      "id": "bf779b7e-3162-4831-9102-5451ae5b9d3f",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "path": "c061378d-a0d7-494a-84b9-0962f73b19fd",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        16
+      ],
+      "id": "5fcda408-2aa5-411a-bd2e-0c30f4a08286",
+      "name": "Webhook",
+      "webhookId": "c061378d-a0d7-494a-84b9-0962f73b19fd"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "0c611f13-b3a9-4e0f-a365-1eb01942c3b2",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-23T15:22:38.115Z",
+      "createdAt": "2026-04-23T15:22:38.115Z",
+      "role": "workflow:owner",
+      "workflowId": "noijKxocBgxYsehq",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
