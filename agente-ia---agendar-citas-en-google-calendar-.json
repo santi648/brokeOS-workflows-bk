@@ -1,0 +1,112 @@
+{
+  "updatedAt": "2026-05-12T14:46:17.511Z",
+  "createdAt": "2026-05-11T08:30:21.769Z",
+  "id": "PsQ29rwYbftuIjzT",
+  "name": "Agente IA - Agendar Citas en Google Calendar",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        64,
+        176
+      ],
+      "id": "992fccbc-ff50-4510-8ad5-baf387729252"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a helpful personal assistant named Jackie.\\n\\nToday's date is {{ $today.format('yyyy-MM-dd') }}.\\n\\nGuidelines:\\n- When summarizing emails, include Sender, Message date, subject, and brief summary of email.\\n- If the user did not specify a date in the request assume they are asking for today.\\n- When answering questions about calendar events, filter out events that don't apply to the question.\\n- When creating calendar entries, add the summary, start time, and end time. Attendee email is optional."
+        }
+      },
+      "name": "Jackie, AI Assistant 👩🏻‍🏫",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        416,
+        176
+      ],
+      "id": "82759782-cf0d-4a44-962a-a1a730f65f19"
+    },
+    {
+      "parameters": {
+        "resource": "Event"
+      },
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        384
+      ],
+      "id": "156c64a2-2407-4436-a884-6eedac8dcb2e"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Start').first().json?.sessionId || 'default' }}"
+      },
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        384
+      ],
+      "id": "4401df4b-36a1-4b10-8b39-cd698425f806"
+    }
+  ],
+  "connections": {
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "aeb5f81f-4ee6-4cf1-8e89-4dba72fc18b5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T08:30:21.769Z",
+      "createdAt": "2026-05-11T08:30:21.769Z",
+      "role": "workflow:owner",
+      "workflowId": "PsQ29rwYbftuIjzT",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
