@@ -1,0 +1,288 @@
+{
+  "updatedAt": "2026-06-09T16:08:25.791Z",
+  "createdAt": "2026-06-04T17:20:04.209Z",
+  "id": "nJt4kH1dYcoHCkPS",
+  "name": "webhookWorkflosApi",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "filters": {
+          "tags": "={{ $json.params.tags }}",
+          "excludePinnedData": true
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5278d80b-bec5-49d6-b1c1-3603c7277d30",
+      "name": "Get many workflows",
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": ":tags",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d6d37e12-d34f-4e65-a4b9-f67ae832f1f7",
+      "name": "Webhook",
+      "webhookId": "700580c5-4140-4dca-9550-194ac47e2ad4"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        688,
+        0
+      ],
+      "id": "c4a4bb34-1490-4d10-956d-dd2d123b0a79",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urlsWebhook = {};\n\n$input.all().forEach(item => {\n  const webhookNode = item.json.nodes?.find(n => n.type === 'n8n-nodes-base.webhook');\n  if (!webhookNode?.webhookId) return;\n  \n  urlsWebhook[item.json.name] = {\n    url: `https://wbhk-n8n.branchtech.co/webhook/${webhookNode.webhookId}`,\n    description: item.json.activeVersion?.description ?? \"\"\n  };\n});\n\nreturn urlsWebhook;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        0
+      ],
+      "id": "f402aa00-5466-4d17-8e21-46a7b51b4eac",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get many workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many workflows": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "app-n8n.branchtech.co",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "es-ES,es;q=0.6",
+            "cache-control": "max-age=0",
+            "cookie": "rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX19spaxelHCysWUHWHghC9LR51jbpFpcpRk%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX1%2FCkzHgZim6LFqFAch9r%2F%2BqJ0LmKn%2BG6u0%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22%24device_id%22%3A%22019d8a99-dd10-7b92-b0b8-c875905a7798%22%2C%22distinct_id%22%3A%22c47a152d58edf6d3891016523f36ef86dd7daff961e08b877c12f65d7fb51298%23f0704092-2348-45fd-b915-f1547f8b213e%22%2C%22%24sesid%22%3A%5B1778171858414%2C%22019e030a-fcd5-704d-ab7c-4d3b3e9167eb%22%2C1778167512268%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fapp-n8n.branchtech.co%2Fsignout%22%7D%2C%22%24user_state%22%3A%22identified%22%7D; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX19QKf9Du1kOMd3s4%2FKPJ462t6%2Bc0l5CkOlvwyTMpF8SQJ2%2FSRTSdW%2BTzPSmg1ZN9phNpE5F1BzrBA%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX1%2BbNSgOnR8uzwtfT0zPEWEFW1WylMSIijSJXV%2BrnE%2BTA5IUYzjuSr5rxeEaVT5MNiKGarKZ7WZc9IOVYVL73D8E1p0umdBh2TJDkOMghyQRJHovOIVnrUbNURq%2B79PhlAkR4S3twaRHgHB9KfQaW7mz3aDbCggSwAM%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX19VtPNXayf5zUCwq81436sn2Uwc6u8PqCX0v3KSsRBJ5Bw3BzNxzoyStwWEX46Mc9jCP9m3PMQGqyxD9kT5Jr0iYHsT%2FuBL42sB3pgFzlXQdvM2%2FZl1II1KKEtfHoC1Lj0gIqhLd62ZnahekkMztV0hEQv%2BC4zfF%2BNFa8XeC2as9J7%2BlShu7C2Bfh%2BRy%2BvMPVIry%2FgcrUft%2BA%3D%3D; ph_phc_kMstNfAgBcBkWSh6KdsgN09heqqNe5VNmalHP1Ni9Q4_posthog=%7B%22%24device_id%22%3A%22019e034e-a2f6-7025-b3b7-7c619f709488%22%2C%22distinct_id%22%3A%22c47a152d58edf6d3891016523f36ef86dd7daff961e08b877c12f65d7fb51298%23f0704092-2348-45fd-b915-f1547f8b213e%22%2C%22%24sesid%22%3A%5B1780606869657%2C%22019e9464-3ef8-7c91-a615-17f90e40b8b4%22%2C1780606058231%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fapp-n8n.branchtech.co%2Fworkflow%2FG6zdfkjPejmzCR9r%22%7D%2C%22%24user_state%22%3A%22identified%22%7D; rl_session=RudderEncrypt%3AU2FsdGVkX1%2BqgBfIY7bHLtDsAFFQSXs2ZXAg3mMh3bcLDMZYS01euLfjGOdhRdeMMhvx02MksyjkGhbogRB3Cl1H%2BTuNhVSUW8Bvb9YLnu8uXQFjqe7JtG2NDtb61t4%2BCDFeyPgNijDY95De2sUVDw%3D%3D",
+            "if-none-match": "W/\"1174-+cOeyLHEiqt0Urdz1JZ5uPsdkc4\"",
+            "priority": "u=0, i",
+            "sec-ch-ua": "\"Chromium\";v=\"148\", \"Brave\";v=\"148\", \"Not/A)Brand\";v=\"99\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "sec-gpc": "1",
+            "upgrade-insecure-requests": "1",
+            "x-forwarded-for": "186.114.108.55",
+            "x-forwarded-host": "app-n8n.branchtech.co",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "f795418d4e89",
+            "x-real-ip": "186.114.108.55"
+          },
+          "params": {
+            "tags": "marketingGmail"
+          },
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://wbhk-n8n.branchtech.co/webhook-test/700580c5-4140-4dca-9550-194ac47e2ad4/:tags",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "versionId": "6bc408ed-5669-421a-b9b3-d7af291a08d5",
+  "activeVersionId": "25e15947-b8c4-4553-ac69-1521287dd9e8",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T17:20:04.209Z",
+      "createdAt": "2026-06-04T17:20:04.209Z",
+      "role": "workflow:owner",
+      "workflowId": "nJt4kH1dYcoHCkPS",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-04T21:36:26.669Z",
+    "createdAt": "2026-06-04T21:36:22.456Z",
+    "versionId": "25e15947-b8c4-4553-ac69-1521287dd9e8",
+    "workflowId": "nJt4kH1dYcoHCkPS",
+    "nodes": [
+      {
+        "parameters": {
+          "filters": {
+            "tags": "={{ $json.params.tags }}",
+            "excludePinnedData": true
+          },
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          224,
+          0
+        ],
+        "id": "5278d80b-bec5-49d6-b1c1-3603c7277d30",
+        "name": "Get many workflows",
+        "credentials": {
+          "n8nApi": {
+            "id": "VfIKJBsNihAATKHc",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "path": ":tags",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d6d37e12-d34f-4e65-a4b9-f67ae832f1f7",
+        "name": "Webhook",
+        "webhookId": "700580c5-4140-4dca-9550-194ac47e2ad4"
+      },
+      {
+        "parameters": {
+          "respondWith": "allIncomingItems",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          688,
+          0
+        ],
+        "id": "c4a4bb34-1490-4d10-956d-dd2d123b0a79",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "jsCode": "const urlsWebhook = {};\n\n$input.all().forEach(item => {\n  const webhookNode = item.json.nodes?.find(n => n.type === 'n8n-nodes-base.webhook');\n  if (!webhookNode?.webhookId) return;\n\n  urlsWebhook[item.json.name] = `https://wbhk-n8n.branchtech.co/webhook/${webhookNode.webhookId}`;\n});\n\nreturn urlsWebhook;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          0
+        ],
+        "id": "f402aa00-5466-4d17-8e21-46a7b51b4eac",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get many workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get many workflows": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 25e15947",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
