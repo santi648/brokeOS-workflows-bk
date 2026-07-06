@@ -1,0 +1,174 @@
+{
+  "updatedAt": "2026-06-05T15:56:03.951Z",
+  "createdAt": "2026-06-05T15:56:03.951Z",
+  "id": "crNn5kWHCqJKSUsi",
+  "name": "userLogOut",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "-1003743218323",
+        "text": "=🔴 El usuario {{ $json.message_name }} con el login {{ $json.message_login  }} se desconecto ",
+        "replyMarkup": "none",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        80
+      ],
+      "id": "d0878178-844a-4818-9127-c361f217e5ec",
+      "name": "logOut",
+      "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": false
+    },
+    {
+      "id": "eff998ba-2b1c-4589-b99d-b6d1745fc287",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        144,
+        80
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_login",
+              "type": "any"
+            },
+            {
+              "name": "message_name",
+              "type": "any"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "logOut",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "871aa05c-5e2d-4f84-b97e-ea0c19e37b5e",
+  "activeVersionId": "871aa05c-5e2d-4f84-b97e-ea0c19e37b5e",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-05T15:56:03.951Z",
+      "createdAt": "2026-06-05T15:56:03.951Z",
+      "role": "workflow:owner",
+      "workflowId": "crNn5kWHCqJKSUsi",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-05T15:56:03.951Z",
+    "createdAt": "2026-06-05T15:56:03.951Z",
+    "versionId": "871aa05c-5e2d-4f84-b97e-ea0c19e37b5e",
+    "workflowId": "crNn5kWHCqJKSUsi",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "-1003743218323",
+          "text": "=🔴 El usuario {{ $json.message_name }} con el login {{ $json.message_login  }} se desconecto ",
+          "replyMarkup": "none",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          352,
+          80
+        ],
+        "id": "d0878178-844a-4818-9127-c361f217e5ec",
+        "name": "logOut",
+        "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        },
+        "disabled": false
+      },
+      {
+        "id": "eff998ba-2b1c-4589-b99d-b6d1745fc287",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          144,
+          80
+        ],
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "message_login",
+                "type": "any"
+              },
+              {
+                "name": "message_name",
+                "type": "any"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "logOut",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
