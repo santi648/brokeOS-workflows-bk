@@ -1,0 +1,731 @@
+{
+  "updatedAt": "2026-07-01T18:32:44.870Z",
+  "createdAt": "2026-05-22T15:58:44.076Z",
+  "id": "h2uMSREC5i3TxNca",
+  "name": "WebsocketPostions",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/positions?fmt=json",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "xat",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshEnabled": true,
+        "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+        "tokenRefreshHeaders": {
+          "headers": [
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshFormFields": {
+          "fields": [
+            {
+              "name": "tipo",
+              "value": "Websockets"
+            },
+            {
+              "name": "ttl_hours",
+              "value": "12"
+            }
+          ]
+        },
+        "tokenRefreshResponsePath": "new_token",
+        "reconnectInterval": 1,
+        "maxReconnectAttempts": 5
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d3109216-810c-42db-bb15-e32b3f9440bd",
+      "name": "WebSocket Reconnect1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageWS"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "b6c96d81-1aaa-4ffb-99dd-e07589d6a359",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/risk-monitor/{{ $('Switch').item.json.message.login }}/growth-rate",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        464
+      ],
+      "id": "9c97bf62-f23a-412e-b453-5d3cadb482d9",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        464
+      ],
+      "name": "Call integridadDatos",
+      "id": "e54c02a7-8747-4e65-b05b-16469e83b96b"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        464
+      ],
+      "id": "6b2e717c-ff3a-4718-bb0d-23ba5ccddd1f",
+      "name": "getAccessToken",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://transactionalapi.branchtech.co/dev/api/v1/risk-monitor/{{ $('Switch').item.json.message.login }}/growth-rate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('getAccessToken').item.json.propertyName }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        128,
+        464
+      ],
+      "id": "f5d81b16-20af-41c4-880a-0bf75435b4f5",
+      "name": "getFollowups"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aoARS3EnMWz1fN3u",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/aoARS3EnMWz1fN3u",
+          "cachedResultName": "aviso X-aumento"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "login": "={{ $json.message.login }}"
+          },
+          "matchingColumns": [
+            "login"
+          ],
+          "schema": [
+            {
+              "id": "login",
+              "displayName": "login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        80
+      ],
+      "name": "Call aviso X-aumento",
+      "id": "8cf8d31d-9409-4d30-af7a-189cb935daa5"
+    }
+  ],
+  "connections": {
+    "WebSocket Reconnect1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "getFollowups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getAccessToken": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Call aviso X-aumento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "WebSocket Reconnect1": [
+      {
+        "json": {
+          "event": "message",
+          "message": {
+            "action": 1,
+            "action_string": "POSITION_SELL",
+            "commission": 0,
+            "dealer": 0,
+            "ev_kind": "add",
+            "expert_id": 0,
+            "handle": 1,
+            "login": 100170,
+            "lots": 5,
+            "price_current": 5750.1375,
+            "price_open": 5749.6576,
+            "price_sl": 0,
+            "price_tp": 0,
+            "profit": -2.4,
+            "reason": 0,
+            "reason_string": "POSITION_REASON_CLIENT",
+            "storage": 0,
+            "symbol": "Crash 1000 Index",
+            "ticket": 194683,
+            "time_create_msc": 1779471232848,
+            "time_update_msc": 1779471232848,
+            "volume": 50000,
+            "volume_ext": 500000000
+          },
+          "ws": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "808683b1-f19b-4939-bab2-74966e9f341a",
+  "activeVersionId": "7c14f422-26d1-4624-bb26-19b788821657",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-22T15:58:44.076Z",
+      "createdAt": "2026-05-22T15:58:44.076Z",
+      "role": "workflow:owner",
+      "workflowId": "h2uMSREC5i3TxNca",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-04T19:38:25.314Z",
+    "createdAt": "2026-05-25T06:29:22.515Z",
+    "versionId": "7c14f422-26d1-4624-bb26-19b788821657",
+    "workflowId": "h2uMSREC5i3TxNca",
+    "nodes": [
+      {
+        "parameters": {
+          "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/positions?fmt=json",
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "xat",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshEnabled": true,
+          "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+          "tokenRefreshHeaders": {
+            "headers": [
+              {
+                "name": "X-Admin-Token",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshFormFields": {
+            "fields": [
+              {
+                "name": "tipo",
+                "value": "Websockets"
+              },
+              {
+                "name": "ttl_hours",
+                "value": "12"
+              }
+            ]
+          },
+          "tokenRefreshResponsePath": "new_token",
+          "reconnectInterval": 1,
+          "maxReconnectAttempts": 5
+        },
+        "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d3109216-810c-42db-bb15-e32b3f9440bd",
+        "name": "WebSocket Reconnect1"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "open",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageOpenWS"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "message",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageWS"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          176,
+          0
+        ],
+        "id": "b6c96d81-1aaa-4ffb-99dd-e07589d6a359",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d32afad5-755a-4d9f-b105-140afb230324",
+                "name": "path",
+                "value": "=/api/v1/risk-monitor/{{ $('Switch').item.json.message.login }}/growth-rate",
+                "type": "string"
+              },
+              {
+                "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+                "name": "body_json",
+                "value": "=",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -320,
+          464
+        ],
+        "id": "9c97bf62-f23a-412e-b453-5d3cadb482d9",
+        "name": "path"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hNkfZRxj5g8aESFu",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+            "cachedResultName": "integridadDatos"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          -96,
+          464
+        ],
+        "name": "Call integridadDatos",
+        "id": "e54c02a7-8747-4e65-b05b-16469e83b96b"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "accessToken",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -544,
+          464
+        ],
+        "id": "6b2e717c-ff3a-4718-bb0d-23ba5ccddd1f",
+        "name": "getAccessToken",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://transactionalapi.branchtech.co/dev/api/v1/risk-monitor/{{ $('Switch').item.json.message.login }}/growth-rate",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('getAccessToken').item.json.propertyName }}"
+              },
+              {
+                "name": "X-Timestamp",
+                "value": "={{ $json[\"X-Timestamp\"] }}"
+              },
+              {
+                "name": "X-Nonce",
+                "value": "={{ $json[\"X-Nonce\"] }}"
+              },
+              {
+                "name": "X-Signature",
+                "value": "={{ $json[\"X-Signature\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          128,
+          464
+        ],
+        "id": "f5d81b16-20af-41c4-880a-0bf75435b4f5",
+        "name": "getFollowups"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "aoARS3EnMWz1fN3u",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/aoARS3EnMWz1fN3u",
+            "cachedResultName": "aviso X-aumento"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "login": "={{ $json.message.login }}"
+            },
+            "matchingColumns": [
+              "login"
+            ],
+            "schema": [
+              {
+                "id": "login",
+                "displayName": "login",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "type": "number",
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          496,
+          80
+        ],
+        "name": "Call aviso X-aumento",
+        "id": "8cf8d31d-9409-4d30-af7a-189cb935daa5"
+      }
+    ],
+    "connections": {
+      "WebSocket Reconnect1": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "path": {
+        "main": [
+          [
+            {
+              "node": "Call integridadDatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call integridadDatos": {
+        "main": [
+          [
+            {
+              "node": "getFollowups",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getAccessToken": {
+        "main": [
+          [
+            {
+              "node": "path",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Call aviso X-aumento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 7c14f422",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
