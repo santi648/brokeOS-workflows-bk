@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2026-06-23T09:00:32.968Z",
+  "createdAt": "2026-05-14T04:59:08.245Z",
+  "id": "WsE04V6LImDJAttb",
+  "name": "My workflow 19",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "ca1181ae-d147-44b4-9228-2e76e3be2764",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T04:59:08.245Z",
+      "createdAt": "2026-05-14T04:59:08.245Z",
+      "role": "workflow:owner",
+      "workflowId": "WsE04V6LImDJAttb",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
