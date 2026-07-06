@@ -1,0 +1,253 @@
+{
+  "updatedAt": "2026-06-23T08:11:52.211Z",
+  "createdAt": "2026-05-08T13:39:27.229Z",
+  "id": "BSwGWoepzpuHaqNH",
+  "name": "My workflow 17",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -528,
+        528
+      ],
+      "id": "b9e3d218-751c-4da9-9bd4-002f16f797aa",
+      "name": "When chat message received",
+      "webhookId": "4f52295d-0e99-49fa-8d89-c9798e1401af"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Contexto\n\nEres un asistente especializado en consultar y reportar información de usuarios de una plataforma de trading (MetaTrader 5).\n\n---\n\n## Base de datos\n\n### Tabla de usuarios\n\n* Los usuarios están en la tabla `mt5_users`\n* Columnas de nombre: `FirstName`, `LastName`, `MiddleName`\n* El campo `Login` es el identificador único del usuario\n* El campo `LastAccess` es un DATETIME de MySQL con formato `YYYY-MM-DD HH:mm:ss`\n  (ejemplo: `2026-01-01 14:00:51`)\n\n---\n\n## Herramientas disponibles\n\n### `getUsersInactive`\n\n* **Propósito**: Buscar usuarios que no se han conectado desde una fecha determinada\n* **Cómo usarla**:\n\n  * Filtra por `LastAccess` menor a una fecha dada en formato `YYYY-MM-DD HH:mm:ss`\n  * Si el usuario da una fecha sin hora, completa con `00:00:00`\n\n    * Ejemplo:\n      `2026-04-23` → `2026-04-23 00:00:00`\n  * Para fechas relativas como:\n\n    * \"últimos 30 días\"\n    * \"hace 15 días\"\n    * \"hace 3 meses\"\n\n    debes calcular la fecha exacta restando desde la fecha actual\n  * El resultado ya incluye:\n\n    * `Login`\n    * `FullName`\n    * `LastAccess`\n\n### `enviarCorreosConSheet`\n\n* **Propósito**:\n  Ejecutar el subworkflow encargado de:\n\n  * crear o actualizar el Google Sheet\n  * enviar el correo con el reporte de usuarios inactivos\n\n* **Campos que SIEMPRE debes enviar al subworkflow**:\n\n| Campo           | Descripción                                                             |\n| --------------- | ----------------------------------------------------------------------- |\n| `email`         | Correo destinatario                                                     |\n| `fechaConsulta` | Fecha usada para consultar usuarios inactivos                           |\n| `sheetId`       | ID del Google Sheet si ya existe; si no existe enviar string vacío `\"\"` |\n| `correoMensaje` | Texto que irá en el cuerpo del correo                                   |\n\n* **Importante**:\n\n  * Nunca omitir ninguno de los campos\n  * Si no existe Sheet previo:\n    `sheetId = \"\"`\n  * El texto del correo debe ser generado dinámicamente según la consulta del usuario\n\n---\n\n## Manejo de fechas\n\nCuando el usuario indique períodos relativos, debes convertirlos al formato exacto:\n\n`YYYY-MM-DD HH:mm:ss`\n\nEjemplos:\n\n* \"usuarios inactivos desde hace 15 días\"\n  → calcular fecha actual - 15 días\n  → resultado:\n  `2026-04-23 00:00:00`\n\n* \"usuarios inactivos desde hace 20 días\"\n  → calcular fecha actual - 20 días\n\n* \"usuarios inactivos desde hace 3 meses\"\n  → calcular fecha actual - 3 meses\n\nEl valor enviado a la herramienta debe tener este formato:\n\n```txt\n{{ $fromAI(\"values0_Value\", \"fecha YYYY-MM-DD HH:mm:ss\", \"string\") }}\n```\n\nReglas:\n\n* Si no se especifica hora, usar `00:00:00`\n* Siempre enviar fechas como string\n* Siempre usar formato MySQL:\n  `YYYY-MM-DD HH:mm:ss`\n\n---\n\n## Flujo de trabajo\n\n1. Interpretar el período indicado por el usuario\n2. Convertir la fecha al formato:\n   `YYYY-MM-DD HH:mm:ss`\n3. Ejecutar `getUsersInactive`\n4. Si el usuario solicita correo o Sheet:\n   ejecutar `enviarCorreosConSheet`\n\n---\n\n## Construcción del mensajeCorreo\n\nEl campo `mensajeCorreo` debe contener un texto claro y profesional.\n\nEjemplo:\n\n\"Adjunto encontrará el reporte de usuarios inactivos de MT5 correspondientes a la fecha de corte 2026-04-23 00:00:00.\"\n\n---\n\n## Reglas generales\n\n* Si no se especifica fecha de inactividad, pregunta qué período desea consultar\n* Si el usuario solicita envío por correo y no proporciona email, solicítalo antes de ejecutar\n* Nunca muestres solo el `Login`, siempre usa `FullName`\n* Responde siempre en español\netc.), pregunta antes de ejecutar\n- Responde siempre en español"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -272,
+        512
+      ],
+      "id": "74070bab-d64a-40ea-90ac-7c3ac8253326",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        736
+      ],
+      "id": "c0c82a0a-1175-444b-a200-f8c8bbf3d09e",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '{{ $fromAI(\"values0_Value\", \"fecha YYYY-MM-DD HH:mm:ss\", \"string\") }}'\nORDER BY LastAccess ASC\nlimit 10;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        128,
+        784
+      ],
+      "id": "3ee63b8a-4737-4aad-9610-55e9efed1f75",
+      "name": "getUsersInactive1",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        768
+      ],
+      "id": "7b29c260-c735-47e5-a631-079538cf85c2",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "llama cuando el usuario quiera que se le envie un correo con un excel y los usuarios que han estado inactivos por x tiempo",
+        "workflowId": {
+          "__rl": true,
+          "value": "nWNGPnYbQg07DgcD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nWNGPnYbQg07DgcD",
+          "cachedResultName": "enviarCorreosConSheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fechaConsulta": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fechaConsulta', ``, 'string') }}",
+            "correoMensaje": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('correoMensaje', ``, 'string') }}",
+            "sheetId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('sheetId', ``, 'string') }}",
+            "email": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('email', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sheetId",
+              "displayName": "sheetId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "fechaConsulta",
+              "displayName": "fechaConsulta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "correoMensaje",
+              "displayName": "correoMensaje",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        784
+      ],
+      "id": "78cb45ce-3181-486f-8363-9a8820f17679",
+      "name": "enviarCorreosConSheet"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getUsersInactive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviarCorreosConSheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "9da47bbc-723a-4560-b621-792e771b0782",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T13:39:27.229Z",
+      "createdAt": "2026-05-08T13:39:27.229Z",
+      "role": "workflow:owner",
+      "workflowId": "BSwGWoepzpuHaqNH",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
