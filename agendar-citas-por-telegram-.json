@@ -1,0 +1,159 @@
+{
+  "updatedAt": "2026-05-12T14:45:49.783Z",
+  "createdAt": "2026-05-12T06:20:27.735Z",
+  "id": "e6CmstzOazU01zJ4",
+  "name": "Agendar Citas por Telegram",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful personal assistant named Jackie. \n\nToday's date is {{ $today.format('yyyy-MM-dd') }}.\n\nGuidelines:\n- When the user asks to schedule an event in your Google Calendar, extract the summary, start time (default to today if not specified), and duration.\n- Always confirm with the user before creating the event.\n- Use the Google Calendar tool to get calendar events or create new ones."
+        }
+      },
+      "name": "Jackie, AI Assistant 👩🏻‍🏫",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        280,
+        0
+      ],
+      "id": "babc452e-e3d2-462a-87c0-27dc103822fa"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        224
+      ],
+      "id": "279aa5da-f5de-4d8a-8b21-c96f7b09e7ca",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "YOUR_CREDENTIAL_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Listen for incoming events').first().json.message?.from?.id || 'default' }}"
+      },
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        224
+      ],
+      "id": "0cdb75bc-c751-4d1f-9c70-ae2bb06def87"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "name": "OpenRouter",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        224
+      ],
+      "id": "85b1b8f1-83af-4431-9eaa-eebb50fec283"
+    },
+    {
+      "parameters": {},
+      "name": "Listen for incoming events",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "33414edb-4b4c-4634-bf0a-c6b46914971e"
+    }
+  ],
+  "connections": {
+    "Listen for incoming events": {
+      "main": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Jackie, AI Assistant 👩🏻‍🏫",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "17c11c96-d9ec-459d-8a03-aa9f65f0ae6d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T06:20:27.735Z",
+      "createdAt": "2026-05-12T06:20:27.735Z",
+      "role": "workflow:owner",
+      "workflowId": "e6CmstzOazU01zJ4",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
