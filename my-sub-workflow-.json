@@ -1,0 +1,97 @@
+{
+  "updatedAt": "2026-05-25T14:54:58.865Z",
+  "createdAt": "2026-04-24T16:54:19.743Z",
+  "id": "5Lh2Qnh3N9SnkVbf",
+  "name": "My Sub-workflow",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.message_k_o }} dame un dato con ese numero"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        96,
+        0
+      ],
+      "id": "dd28294d-9da4-4e67-916f-3b2f838badb0",
+      "name": "Message a model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_k_o",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "d5dbeaa0-d31d-41ac-8d88-43b396edc1d4",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -112,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "475b88fe-6acc-4e8d-a5f4-d47060975962",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-24T16:54:19.743Z",
+      "createdAt": "2026-04-24T16:54:19.743Z",
+      "role": "workflow:owner",
+      "workflowId": "5Lh2Qnh3N9SnkVbf",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
