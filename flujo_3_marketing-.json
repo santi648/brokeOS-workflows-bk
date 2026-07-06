@@ -1,0 +1,329 @@
+{
+  "updatedAt": "2026-06-24T14:26:11.738Z",
+  "createdAt": "2026-06-24T14:10:27.226Z",
+  "id": "ojnYZ53UJE0xcS9R",
+  "name": "Flujo_3_Marketing",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://transactionalapi.branchtech.co/dev/api/v1/admin/marketing/segments/kyc-without-deposit",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "start",
+              "value": "={{$today.minus(8, 'days')}}"
+            },
+            {
+              "name": "end",
+              "value": "={{ $today }}"
+            },
+            {
+              "name": "channel",
+              "value": "EMAIL"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Redis').item.json.propertyName  }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        0
+      ],
+      "id": "ebc20fe4-8053-4e98-8c52-e33e785333f9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "71364146-53ff-4ac9-b3e8-46e94dd5041d",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const csv = $input.first().json.data;\nconst lines = csv.trim().split('\\n');\nconst headers = lines[0].split(',');\n\nreturn lines.slice(1).map(line => {\n  const values = line.split(',');\n  const obj = {};\n  headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());\n\n  if (obj.registered_at) {\n    const kycApproved = new Date(obj.kyc_approved_at.split('T')[0]);\n    const today = new Date(new Date().toISOString().split('T')[0]);\n    const diffMs = today - kycApproved;\n    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));\n    obj.days_since_kyc_approved = diffDays;\n  } else {\n    obj.days_since_kyc_approved = null;\n  }\n\n  return { json: obj };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "1f0b7955-55e4-4542-87e7-e7127eb9bdba",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/admin/marketing/segments/kyc-without-deposit",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8b3f8aac-e924-4924-ba74-07e6c9355dec",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "name": "Call integridadDatos",
+      "id": "6b452750-e5b8-4984-be7f-69dd3487bd9d"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "bc9dd765-e6f7-4437-b5f8-e492cbe76abe",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.days_since_kyc_approved }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "6d5a0032-83c5-49fe-9df2-c46c3265642d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1d589463-bdc0-4848-a78e-ac0e879454b5",
+                    "leftValue": "={{ $json.days_since_kyc_approved }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        0
+      ],
+      "id": "43ee6995-2676-4df0-b6c0-38430a237abe",
+      "name": "Switch"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "01df80a3-4c8f-4065-898a-a0d236844cd9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-24T14:10:27.226Z",
+      "createdAt": "2026-06-24T14:10:27.226Z",
+      "role": "workflow:owner",
+      "workflowId": "ojnYZ53UJE0xcS9R",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
