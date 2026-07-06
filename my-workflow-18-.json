@@ -1,0 +1,117 @@
+{
+  "updatedAt": "2026-06-01T14:57:17.428Z",
+  "createdAt": "2026-05-08T17:04:44.743Z",
+  "id": "pYqTl4DqyXiUSKGx",
+  "name": "My workflow 18",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b30420e2-8792-4e2f-a529-fce250bd7627",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "18495",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "=id",
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d4edfc44-85aa-46af-aec1-c290cada3464",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LxO592VYSvIpM9fz",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "hola"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "232f10df-4058-4d74-b768-5a7ad75db37c",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LxO592VYSvIpM9fz",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "9b5a6264-361e-4f39-a2fc-711ac57b7acd",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T17:04:44.743Z",
+      "createdAt": "2026-05-08T17:04:44.743Z",
+      "role": "workflow:owner",
+      "workflowId": "pYqTl4DqyXiUSKGx",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
