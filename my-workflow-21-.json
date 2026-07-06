@@ -1,0 +1,261 @@
+{
+  "updatedAt": "2026-05-26T21:30:10.562Z",
+  "createdAt": "2026-05-26T14:26:25.792Z",
+  "id": "tsfO0Nj7Muh5W9I9",
+  "name": "My workflow 21",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://stream.binance.com:9443/ws/btcusdt@trade"
+      },
+      "type": "n8n-nodes-websocket-ws.websocketTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a032411-c5d9-4482-b3f7-bd6712cbd36f",
+      "name": "Websocket Connection & Message"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageWS"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        16
+      ],
+      "id": "77ea480f-24d1-4ce5-bcec-4300bef3ad14",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "0lCBqR0bIVBKfb4T",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/0lCBqR0bIVBKfb4T",
+          "cachedResultName": "userConnections"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $('Switch').item.json.message.login }}"
+          },
+          "matchingColumns": [
+            "message_login"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        112
+      ],
+      "name": "Call usersMqid1",
+      "id": "4bd2b4f0-c5aa-4c17-9d15-c16cf2f5ba7a"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Hq46rNTRMHr2BAjM",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Hq46rNTRMHr2BAjM",
+          "cachedResultName": "loginsMarcados"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $('Switch').item.json.message.login }}",
+            "action_string": "={{ $json.message.action_string }}",
+            "lots": "={{ $json.message.lots }}",
+            "symbols": "={{ $json.message.symbol }}"
+          },
+          "matchingColumns": [
+            "message_login"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action_string",
+              "displayName": "action_string",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "lots",
+              "displayName": "lots",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "symbols",
+              "displayName": "symbols",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        -80
+      ],
+      "name": "Call loginsMarcados",
+      "id": "83097379-66b8-453d-9b8f-0e38a68a25b0"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Call usersMqid1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call loginsMarcados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Websocket Connection & Message": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "e33c10c8-bdd9-4bde-b02b-9e9f22bd30a4",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-26T14:26:25.792Z",
+      "createdAt": "2026-05-26T14:26:25.792Z",
+      "role": "workflow:owner",
+      "workflowId": "tsfO0Nj7Muh5W9I9",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
