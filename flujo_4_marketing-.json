@@ -1,0 +1,377 @@
+{
+  "updatedAt": "2026-06-24T15:21:23.118Z",
+  "createdAt": "2026-06-24T14:27:01.851Z",
+  "id": "fine1JKoujF3wPT3",
+  "name": "Flujo_4_marketing",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://transactionalapi.branchtech.co/dev/api/v1/admin/marketing/segments/inactive",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "start",
+              "value": "={{$today.minus(60, 'days')}}"
+            },
+            {
+              "name": "end",
+              "value": "={{ $today }}"
+            },
+            {
+              "name": "channel",
+              "value": "EMAIL"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Redis').item.json.propertyName  }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        -336
+      ],
+      "id": "67609774-c5bb-40d1-ae82-59f62bacab8b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -336
+      ],
+      "id": "2f424d50-ca19-4dd1-8646-7811ba4daa2b",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/admin/marketing/segments/inactive",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -192,
+        -336
+      ],
+      "id": "ed51fab2-8c0d-4cac-80b9-31be2a1ec3df",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        -336
+      ],
+      "name": "Call integridadDatos",
+      "id": "de1c7b9e-e6af-4fe3-b43b-4bb6993a99be"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        -336
+      ],
+      "id": "ea4acdfa-2bfd-4a2b-85b0-e67a22faa57a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.days_since_deposit }}",
+                    "rightValue": 15,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "186e3ea9-9a91-4201-a3c5-fde33b66edcc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 15"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4f4fb256-1b16-4515-940b-1c13438d73a8",
+                    "leftValue": "={{ $json.days_since_deposit }}",
+                    "rightValue": 30,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 30"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dd08fcb7-0bbc-4a28-8e0b-e7eb26bf8678",
+                    "leftValue": "={{ $json.days_since_deposit }}",
+                    "rightValue": 45,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 45"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9ea4f9eb-be33-4f4c-8ec8-6a21bd73fcba",
+                    "leftValue": "={{ $json.days_since_deposit }}",
+                    "rightValue": 60,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "DIA 60"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -368
+      ],
+      "id": "e4f0e44a-1bba-43d5-b391-3b4b6281bb75",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const csv = $input.first().json.data;\nconst lines = csv.trim().split('\\n');\nconst headers = lines[0].split(',');\n\nreturn lines.slice(1).map(line => {\n  const values = line.split(',');\n  const obj = {};\n  headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim());\n\n  const today = new Date(new Date().toISOString().split('T')[0]);\n\n  if (obj.is_first_deposit === 'true' && obj.deposit_at) {\n    const depositDate = new Date(obj.deposit_at.split('T')[0]);\n    const diffMs = today - depositDate;\n    obj.days_since_deposit = Math.floor(diffMs / (1000 * 60 * 60 * 24));\n  } else if (obj.registered_at) {\n    const registeredDate = new Date(obj.registered_at.split('T')[0]);\n    const diffMs = today - registeredDate;\n    obj.days_since_registered = Math.floor(diffMs / (1000 * 60 * 60 * 24));\n  } else {\n    obj.days_since_deposit = null;\n  }\n\n  return { json: obj };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -336
+      ],
+      "id": "23e28d07-d170-4ab3-ae19-11bd9c22e1fb",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "8d309605-3afe-4e46-b9ed-6f891855285d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-24T14:27:01.851Z",
+      "createdAt": "2026-06-24T14:27:01.851Z",
+      "role": "workflow:owner",
+      "workflowId": "fine1JKoujF3wPT3",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
