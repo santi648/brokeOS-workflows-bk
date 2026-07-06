@@ -1,0 +1,100 @@
+{
+  "updatedAt": "2026-05-25T14:56:40.613Z",
+  "createdAt": "2026-05-07T15:25:55.069Z",
+  "id": "G6zdfkjPejmzCR9r",
+  "name": "My workflow 15",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -48
+      ],
+      "id": "bfa1a9e3-5c7f-4457-94c6-bd816db9dab6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "table": {
+          "__rl": true,
+          "value": "mt5_time",
+          "mode": "list",
+          "cachedResultName": "mt5_time"
+        },
+        "limit": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "ce58ae99-9a60-495a-b979-a0360dd9a184",
+      "name": "Select rows from a table",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "15397c59-9adf-4e71-a783-55902884fa52"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -160
+      ],
+      "id": "30a0fc76-30df-45b5-a1d8-541a89837931",
+      "name": "MCP Server Trigger",
+      "webhookId": "15397c59-9adf-4e71-a783-55902884fa52"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Select rows from a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "7a465206-ac59-4c92-ac92-7e88c0f86980",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-07T15:25:55.069Z",
+      "createdAt": "2026-05-07T15:25:55.069Z",
+      "role": "workflow:owner",
+      "workflowId": "G6zdfkjPejmzCR9r",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
