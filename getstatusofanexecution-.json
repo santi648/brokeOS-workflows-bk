@@ -1,0 +1,291 @@
+{
+  "updatedAt": "2026-06-09T21:49:29.967Z",
+  "createdAt": "2026-06-09T13:57:06.272Z",
+  "id": "I9Q9qA9D30SvnR7K",
+  "name": "getStatusOfAnExecution",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "/:id",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "979e6787-bffd-4a0f-9038-3aca8caccb6e",
+      "name": "Webhook",
+      "webhookId": "30bd9898-27a9-4ac2-b8bc-4f82632fc161"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        0
+      ],
+      "id": "46e478fe-a335-4c67-bc48-460d1542bb86",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "execution",
+        "operation": "get",
+        "executionId": "={{ $json.params.id }}",
+        "options": {
+          "activeWorkflows": true
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "64cd3e0c-8194-4bca-8b81-67e54e4730b9",
+      "name": "Get an execution",
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const executions = $input.all().map(item => item.json);\n\nconst filtered = executions.map(exec => {\n  const runData = exec?.data?.resultData?.runData ?? {};\n\n  const nodes = Object.entries(runData).map(([nodeName, runs]) => {\n    const run = runs[0];\n\n    const error = run?.error\n      ? {\n          message: run.error.message ?? null,\n          description: run.error.description ?? null,\n          type: run.error.type ?? null,\n          context: run.error.context ?? null,\n          httpCode: run.error.httpCode ?? null,\n        }\n      : null;\n\n    return {\n      name: nodeName,\n      status: run?.executionStatus ?? null,\n      index: run?.executionIndex ?? null,\n      ...(error && { error }),\n      ...(exec.status !== 'success' && { executionMs: run?.executionTime ?? null }),\n    };\n  });\n\n  nodes.sort((a, b) => a.index - b.index);\n\n  const startedAt = new Date(exec.startedAt);\n  const stoppedAt = new Date(exec.stoppedAt);\n\n  const lastNodeName = exec.data?.resultData?.lastNodeExecuted;\n  const lastRun = lastNodeName ? runData[lastNodeName]?.[0] : null;\n\n  const output = (() => {\n    if (!lastRun) return null;\n    if (lastRun.error) {\n      return {\n        error: {\n          message: lastRun.error.message ?? null,\n          description: lastRun.error.description ?? null,\n          type: lastRun.error.type ?? null,\n          context: lastRun.error.context ?? null,\n          httpCode: lastRun.error.httpCode ?? null,\n        }\n      };\n    }\n    return lastRun?.data?.main?.[0]?.[0]?.json ?? null;\n  })();\n\n  const firstNode = Object.values(runData)[0];\n  const firstJson = firstNode?.[0]?.data?.main?.[0]?.[0]?.json ?? null;\n\n  return {\n    executionId: String(exec.id),\n    workflowId: exec.workflowId,\n    workflowName: exec.workflowData?.name ?? null,\n    status: exec.status,\n    mode: exec.mode,\n    startedAt: exec.startedAt,\n    stoppedAt: exec.stoppedAt,\n    durationMs: stoppedAt - startedAt,\n    input: firstJson\n      ? {\n          body: firstJson.body ?? null,\n          query: firstJson.query ?? null,\n        }\n      : null,\n    nodes,\n    lastNodeExecuted: lastNodeName ?? null,\n    output,\n  };\n});\n\nreturn filtered.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "142864e0-2c8d-433d-88c3-ada2a711f421",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get an execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an execution": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "wbhk-n8n.branchtech.co",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "es-ES,es;q=0.6",
+            "cookie": "rl_page_init_referrer=RudderEncrypt%3AU2FsdGVkX19spaxelHCysWUHWHghC9LR51jbpFpcpRk%3D; rl_page_init_referring_domain=RudderEncrypt%3AU2FsdGVkX1%2FCkzHgZim6LFqFAch9r%2F%2BqJ0LmKn%2BG6u0%3D; ph_phc_4URIAm1uYfJO7j8kWSe0J8lc8IqnstRLS7Jx8NcakHo_posthog=%7B%22%24device_id%22%3A%22019d8a99-dd10-7b92-b0b8-c875905a7798%22%2C%22distinct_id%22%3A%22c47a152d58edf6d3891016523f36ef86dd7daff961e08b877c12f65d7fb51298%23f0704092-2348-45fd-b915-f1547f8b213e%22%2C%22%24sesid%22%3A%5B1778171858414%2C%22019e030a-fcd5-704d-ab7c-4d3b3e9167eb%22%2C1778167512268%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fapp-n8n.branchtech.co%2Fsignout%22%7D%2C%22%24user_state%22%3A%22identified%22%7D; rl_anonymous_id=RudderEncrypt%3AU2FsdGVkX184EKYPMKP5hq42nxFrCTibHJSXBePDBH%2BDRkmqPSYw1zNSRZW6tmd3IPW3Co6gIgUGf2yYNL1Nmg%3D%3D; rl_user_id=RudderEncrypt%3AU2FsdGVkX1%2B9vvYRPDdrdtjo7Zs3jw9mCpkAZOtd8rMbn3MFOtmSu9QvDZef8BkJbM1CJpGUlYIKpIsSLC%2Bu9aRnB766XqHcWub6sB63ah4bSBHIplNeGTHdeQZZAQm3w9T8Rs74j%2F3%2F3eTf8IyBy8jB55AYQc6s7jxQWu4XN4c%3D; rl_trait=RudderEncrypt%3AU2FsdGVkX1%2BexkQgzCkX36FHG4b9NjRxVhUlnCGnzSIJp%2FCEHqZydh%2BT4AdoVG2wCPTADdsFSj2k7Ph7gYXTOD8fhET9mTjw8T5BXJ6yth5q3Ly6qARfttmOZx%2FGxhJB42xSIsNWdh%2FcUGrdRGj5tZrwmUoQ1SCBF8WkpbJMrcqIY%2Bwg6ugWrwa2A6msyEm64xW0pkdroMy4QaWliXKgaw%3D%3D; ph_phc_kMstNfAgBcBkWSh6KdsgN09heqqNe5VNmalHP1Ni9Q4_posthog=%7B%22%24device_id%22%3A%22019e034e-a2f6-7025-b3b7-7c619f709488%22%2C%22distinct_id%22%3A%22c47a152d58edf6d3891016523f36ef86dd7daff961e08b877c12f65d7fb51298%23f0704092-2348-45fd-b915-f1547f8b213e%22%2C%22%24sesid%22%3A%5B1781041198142%2C%22019eae2c-677c-75cf-847f-877e16f53350%22%2C1781038606204%5D%2C%22%24epp%22%3Atrue%2C%22%24initial_person_info%22%3A%7B%22r%22%3A%22%24direct%22%2C%22u%22%3A%22https%3A%2F%2Fapp-n8n.branchtech.co%2Fworkflow%2FG6zdfkjPejmzCR9r%22%7D%2C%22%24user_state%22%3A%22identified%22%7D; rl_session=RudderEncrypt%3AU2FsdGVkX1%2BvxuTNRf8Xpf1WBvRonFKAlNNJEZKiCsMKRPX7RPcC6Z7tTvXm8E9Mat9yVxoCbA61fErj6FYKkITgcgt3E4xBsFEzAGwVBJc54WTXl2okSxSz7y%2BNIukpOkEr8OgiELA4elHkhZxhhA%3D%3D",
+            "priority": "u=0, i",
+            "sec-ch-ua": "\"Brave\";v=\"149\", \"Chromium\";v=\"149\", \"Not)A;Brand\";v=\"24\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "sec-gpc": "1",
+            "upgrade-insecure-requests": "1",
+            "x-forwarded-for": "190.253.241.194",
+            "x-forwarded-host": "wbhk-n8n.branchtech.co",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "f795418d4e89",
+            "x-real-ip": "190.253.241.194"
+          },
+          "params": {
+            "id": "427258"
+          },
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://wbhk-n8n.branchtech.co/webhook/30bd9898-27a9-4ac2-b8bc-4f82632fc161/:id",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "4c56e941-8ff2-4c7d-9fc2-994c189322e4",
+  "activeVersionId": "4c56e941-8ff2-4c7d-9fc2-994c189322e4",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-09T13:57:06.272Z",
+      "createdAt": "2026-06-09T13:57:06.272Z",
+      "role": "workflow:owner",
+      "workflowId": "I9Q9qA9D30SvnR7K",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-09T21:49:38.095Z",
+    "createdAt": "2026-06-09T21:49:29.969Z",
+    "versionId": "4c56e941-8ff2-4c7d-9fc2-994c189322e4",
+    "workflowId": "I9Q9qA9D30SvnR7K",
+    "nodes": [
+      {
+        "parameters": {
+          "path": "/:id",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "979e6787-bffd-4a0f-9038-3aca8caccb6e",
+        "name": "Webhook",
+        "webhookId": "30bd9898-27a9-4ac2-b8bc-4f82632fc161"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          624,
+          0
+        ],
+        "id": "46e478fe-a335-4c67-bc48-460d1542bb86",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "resource": "execution",
+          "operation": "get",
+          "executionId": "={{ $json.params.id }}",
+          "options": {
+            "activeWorkflows": true
+          },
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          208,
+          0
+        ],
+        "id": "64cd3e0c-8194-4bca-8b81-67e54e4730b9",
+        "name": "Get an execution",
+        "credentials": {
+          "n8nApi": {
+            "id": "VfIKJBsNihAATKHc",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const executions = $input.all().map(item => item.json);\n\nconst filtered = executions.map(exec => {\n  const runData = exec?.data?.resultData?.runData ?? {};\n\n  const nodes = Object.entries(runData).map(([nodeName, runs]) => {\n    const run = runs[0];\n\n    const error = run?.error\n      ? {\n          message: run.error.message ?? null,\n          description: run.error.description ?? null,\n          type: run.error.type ?? null,\n          context: run.error.context ?? null,\n          httpCode: run.error.httpCode ?? null,\n        }\n      : null;\n\n    return {\n      name: nodeName,\n      status: run?.executionStatus ?? null,\n      index: run?.executionIndex ?? null,\n      ...(error && { error }),\n      ...(exec.status !== 'success' && { executionMs: run?.executionTime ?? null }),\n    };\n  });\n\n  nodes.sort((a, b) => a.index - b.index);\n\n  const startedAt = new Date(exec.startedAt);\n  const stoppedAt = new Date(exec.stoppedAt);\n\n  const lastNodeName = exec.data?.resultData?.lastNodeExecuted;\n  const lastRun = lastNodeName ? runData[lastNodeName]?.[0] : null;\n\n  const output = (() => {\n    if (!lastRun) return null;\n    if (lastRun.error) {\n      return {\n        error: {\n          message: lastRun.error.message ?? null,\n          description: lastRun.error.description ?? null,\n          type: lastRun.error.type ?? null,\n          context: lastRun.error.context ?? null,\n          httpCode: lastRun.error.httpCode ?? null,\n        }\n      };\n    }\n    return lastRun?.data?.main?.[0]?.[0]?.json ?? null;\n  })();\n\n  const firstNode = Object.values(runData)[0];\n  const firstJson = firstNode?.[0]?.data?.main?.[0]?.[0]?.json ?? null;\n\n  return {\n    executionId: String(exec.id),\n    workflowId: exec.workflowId,\n    workflowName: exec.workflowData?.name ?? null,\n    status: exec.status,\n    mode: exec.mode,\n    startedAt: exec.startedAt,\n    stoppedAt: exec.stoppedAt,\n    durationMs: stoppedAt - startedAt,\n    input: firstJson\n      ? {\n          body: firstJson.body ?? null,\n          query: firstJson.query ?? null,\n        }\n      : null,\n    nodes,\n    lastNodeExecuted: lastNodeName ?? null,\n    output,\n  };\n});\n\nreturn filtered.map(item => ({ json: item }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          416,
+          0
+        ],
+        "id": "142864e0-2c8d-433d-88c3-ada2a711f421",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Get an execution",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get an execution": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 4c56e941",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
