@@ -1,0 +1,116 @@
+{
+  "updatedAt": "2026-06-23T14:40:23.593Z",
+  "createdAt": "2026-06-23T07:47:17.115Z",
+  "id": "bJMDxYtALzbGxhuE",
+  "name": "csvAxlsx",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "binaryPropertyName": "hola",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "81399fce-3130-4e49-abf7-1c44a3821cf9",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "formTitle": "EJEMPLO CSV",
+        "formDescription": "hoalasdas",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "hola",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ef726490-e64c-4020-a57e-e60896bd1499",
+      "name": "On form submission",
+      "webhookId": "fcd3b8c5-299b-444c-b923-6b43a8615fc6"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "hola": [
+            {
+              "filename": "ejemploRegistroSinDeposito.csv",
+              "mimetype": "text/csv",
+              "size": 3155
+            }
+          ],
+          "submittedAt": "2026-06-23T02:54:53.951-05:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "hola": {
+            "mimeType": "text/csv",
+            "fileType": "text",
+            "fileExtension": "csv",
+            "data": "database",
+            "fileName": "ejemploRegistroSinDeposito.csv",
+            "id": "database:df543049-b6b5-4a14-974c-73c535fde168",
+            "fileSize": "3.15 kB",
+            "bytes": 3155
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "31a6a224-e045-4908-a6e0-6de0dd4ca291",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-23T07:47:17.115Z",
+      "createdAt": "2026-06-23T07:47:17.115Z",
+      "role": "workflow:owner",
+      "workflowId": "bJMDxYtALzbGxhuE",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
