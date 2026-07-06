@@ -1,0 +1,575 @@
+{
+  "updatedAt": "2026-06-05T15:58:17.094Z",
+  "createdAt": "2026-06-04T21:46:16.290Z",
+  "id": "PkG8Pa7PCYzTei9D",
+  "name": "WebsocketUsers",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "07390d5c-de3d-4dfa-b2d7-13ff861bf592",
+                    "leftValue": "={{ $json.message.ev_kind }}",
+                    "rightValue": 4,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "login"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0437b1c-9c43-4807-a5fe-3026f0ee6aef",
+                    "leftValue": "={{ $json.message.ev_kind }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "logOut"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "4ebf61ff-9298-45e7-a2d7-baa778316c5f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/users?fmt=json",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "xat",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshEnabled": true,
+        "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+        "tokenRefreshHeaders": {
+          "headers": [
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshFormFields": {
+          "fields": [
+            {
+              "name": "tipo",
+              "value": "Websockets"
+            },
+            {
+              "name": "ttl_hours",
+              "value": "12"
+            }
+          ]
+        },
+        "tokenRefreshResponsePath": "new_token",
+        "reconnectInterval": 1,
+        "maxReconnectAttempts": 5
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -112
+      ],
+      "id": "92896568-cb89-48f4-a87c-820d51697451",
+      "name": "WebSocket Reconnect"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        240
+      ],
+      "id": "d7db6136-2827-4bbf-8223-6ecf62f3cf25",
+      "name": "Global Constants",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "fu1QO6ny0SiJQWlf",
+          "name": "Global Constants account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "2bzgmjAskgxbuE3V",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $json.message.login }}",
+            "message_name": "={{ $json.message.name }}"
+          },
+          "matchingColumns": [
+            "message_login",
+            "message_name"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_name",
+              "displayName": "message_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -96
+      ],
+      "name": "Call userLogin",
+      "id": "8be13686-abfc-4a0a-b377-2602200718ba"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "crNn5kWHCqJKSUsi",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_login": "={{ $json.message.login }}",
+            "message_name": "={{ $json.message.name }}"
+          },
+          "matchingColumns": [
+            "message_login",
+            "message_name"
+          ],
+          "schema": [
+            {
+              "id": "message_login",
+              "displayName": "message_login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message_name",
+              "displayName": "message_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        80
+      ],
+      "name": "Call userLogOut",
+      "id": "4fbca6c0-4a67-4d06-b0a6-f7fb4be05d8f"
+    }
+  ],
+  "connections": {
+    "WebSocket Reconnect": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Call userLogin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call userLogOut",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "WebSocket Reconnect": [
+      {
+        "json": {
+          "event": "message",
+          "message": {
+            "balance": 197520,
+            "client_type": 0,
+            "client_type_string": "USER_TYPE_CLIENT",
+            "credit": 0,
+            "ev_kind": 2,
+            "group": "real\\deriv",
+            "handle": 1,
+            "ip": "",
+            "last_access_msc": 1780609807,
+            "leverage": 100,
+            "login": 100170,
+            "mqid": "94C4A08",
+            "name": "Santiago",
+            "registration_msc": 1778695628
+          },
+          "ws": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "2cbb1620-4b8a-4943-860e-617ea8a85dd0",
+  "activeVersionId": "10739392-56ea-4125-80c9-85f3f14cabe2",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T21:46:16.290Z",
+      "createdAt": "2026-06-04T21:46:16.290Z",
+      "role": "workflow:owner",
+      "workflowId": "PkG8Pa7PCYzTei9D",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-04T22:06:03.040Z",
+    "createdAt": "2026-06-04T22:06:00.657Z",
+    "versionId": "10739392-56ea-4125-80c9-85f3f14cabe2",
+    "workflowId": "PkG8Pa7PCYzTei9D",
+    "nodes": [
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "open",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageOpenWS"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "07390d5c-de3d-4dfa-b2d7-13ff861bf592",
+                      "leftValue": "={{ $json.message.ev_kind }}",
+                      "rightValue": 4,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "login"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "e0437b1c-9c43-4807-a5fe-3026f0ee6aef",
+                      "leftValue": "={{ $json.message.ev_kind }}",
+                      "rightValue": 5,
+                      "operator": {
+                        "type": "number",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "logOut"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -80,
+          -80
+        ],
+        "id": "4ebf61ff-9298-45e7-a2d7-baa778316c5f",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/users?fmt=json",
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "xat",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshEnabled": true,
+          "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+          "tokenRefreshHeaders": {
+            "headers": [
+              {
+                "name": "X-Admin-Token",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              }
+            ]
+          },
+          "tokenRefreshFormFields": {
+            "fields": [
+              {
+                "name": "tipo",
+                "value": "Websockets"
+              },
+              {
+                "name": "ttl_hours",
+                "value": "12"
+              }
+            ]
+          },
+          "tokenRefreshResponsePath": "new_token",
+          "reconnectInterval": 1,
+          "maxReconnectAttempts": 5
+        },
+        "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+        "typeVersion": 1,
+        "position": [
+          -336,
+          -112
+        ],
+        "id": "92896568-cb89-48f4-a87c-820d51697451",
+        "name": "WebSocket Reconnect"
+      },
+      {
+        "parameters": {
+          "chatId": "-1003743218323",
+          "text": "=🟢 El usuario {{ $json.message.name }} con el login {{ $json.message.login  }} se conecto ",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          192,
+          -96
+        ],
+        "id": "590c0afb-b48b-4bfa-aeb1-a55436586a96",
+        "name": "login",
+        "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "-1003743218323",
+          "text": "=🔴 El usuario {{ $json.message.name }} con el login {{ $json.message.login  }} se desconecto ",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          192,
+          80
+        ],
+        "id": "d0878178-844a-4818-9127-c361f217e5ec",
+        "name": "logOut",
+        "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "WebSocket Reconnect": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [],
+          [
+            {
+              "node": "login",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "logOut",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 10739392",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
