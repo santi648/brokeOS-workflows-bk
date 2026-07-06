@@ -1,0 +1,548 @@
+{
+  "updatedAt": "2026-05-28T05:00:33.721Z",
+  "createdAt": "2026-05-28T04:51:05.580Z",
+  "id": "vnT2SiMLTBUjh6QL",
+  "name": "Detección Aperturas y Cierres - Logins Marcados",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://api.kynex.trade:7100/ws/profit_update?groups=*&poll_interval_ms=5000",
+        "tokenRefreshEnabled": true,
+        "tokenRefreshUrl": "https://api.kynex.trade:7100/api/token/latest",
+        "tokenRefreshMethod": "GET",
+        "tokenRefreshHeaders": {
+          "headers": [
+            {
+              "name": "x-Admin",
+              "value": "I-B+R@T(>fGz@45CIZahRv=C:.q+YO3$}yIY)i!1.>)b)*Z^BSZYU3EgI8K=<1rS"
+            }
+          ]
+        },
+        "tokenRefreshResponsePath": "token",
+        "tokenRefreshTargetParam": "token",
+        "tokenRefreshValuePrefix": ""
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        240
+      ],
+      "id": "d78799ae-8556-4af3-9d61-967913ebfe37",
+      "name": "WebSocket Kynex Trigger"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageWS"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        240
+      ],
+      "id": "d6bc4865-8686-44db-932c-b81dcb09b602",
+      "name": "Switch evento"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "bearerProductionPositions",
+        "value": "={{ $json.bearerToken }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        176,
+        144
+      ],
+      "id": "af51e0ff-6bd7-4242-b8c6-c85121ef6498",
+      "name": "Guardar Bearer Token",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "loginsMarcadosProduccion",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        176,
+        336
+      ],
+      "id": "998ba51b-f4e7-4e44-a360-f79a26d5fb94",
+      "name": "Leer Logins Marcados",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const accounts = $(\"Switch evento\").first().json.message.accounts;\nconst raw = $('Leer Logins Marcados').first().json.propertyName;\nconst listaLogins = JSON.parse(raw);\nconst listaLoginsStr = listaLogins.map(l => String(l));\n\nconst symbolsAllowed = [\n  \"BearX1000.\",\"BearX400.\",\"BearX500.\",\"BearX777.\",\"BearX900.\",\n  \"BullX1000.\",\"BullX400.\",\"BullX500.\",\"BullX777.\",\"BullX900.\",\n  \"EmasVol10\",\"EmasVol100\",\"EmasVol20\",\"EmasVol30\",\"EmasVol40\",\n  \"EmasVol50\",\"EmasVol60\",\"EmasVol70\",\"EmasVol80\",\"EmasVol90\",\n  \"FomoX111.\",\"FomoX333.\",\"FomoX555.\",\"FomoX888.\",\"FomoX999.\",\n  \"FomoXpeed100.\",\"Fortune100.\",\"Fortune1000.\",\"Fortune250.\",\n  \"Fortune500.\",\"FortuneX200.\",\"FortuneX300.\",\"FortuneX500.\",\n  \"LionX100\",\"LionX120\",\"LionX150\",\"LionX200\",\"LionX25\",\n  \"LionX40\",\"LionX50\",\"LionX60\",\"LionX75\",\"LionX90\",\n  \"VorteX100.\",\"VorteX20.\",\"VorteX40.\",\"VorteX60.\",\"VorteX80.\",\n  \"XpeedDown200\",\"XpeedDown300\",\"XpeedUp200\",\"XpeedUp300\"\n];\n\nconst cuentasFiltradas = accounts.filter(account =>\n  listaLoginsStr.includes(String(account.login))\n);\n\nconst resultado = listaLoginsStr\n  .map(loginStr => {\n    const cuenta = cuentasFiltradas.find(a => String(a.login) === loginStr);\n    if (!cuenta) return null;\n    return {\n      login: cuenta.login,\n      name: cuenta.name,\n      positions: (cuenta.positions ?? [])\n        .filter(p => symbolsAllowed.includes(p.symbol))\n        .map(p => ({\n          ticket: p.ticket,\n          symbol: p.symbol,\n          volume: p.volume,\n          action: p.action,\n          time_create: p.time_create\n        }))\n    };\n  })\n  .filter(Boolean);\n\nreturn resultado.map(account => ({ json: account }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        336
+      ],
+      "id": "ab50713f-9c6a-4a7e-8b09-5c6810b0d91d",
+      "name": "Filtrar Cuentas y Símbolos"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "posicionesPrevias",
+        "key": "=positions:{{ $json.login }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        624,
+        336
+      ],
+      "id": "bdc8ac73-add1-4011-87d1-98acc32ae770",
+      "name": "Leer Estado Anterior",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const login = $('Filtrar Cuentas y Símbolos').item.json.login;\nconst name  = $('Filtrar Cuentas y Símbolos').item.json.name;\nconst posicionesActuales = $('Filtrar Cuentas y Símbolos').item.json.positions;\n\nlet posicionesPrevias = [];\ntry {\n  const raw = $json.posicionesPrevias;\n  if (raw) posicionesPrevias = JSON.parse(raw);\n} catch(e) {\n  posicionesPrevias = [];\n}\n\nconst setActuales = new Set(posicionesActuales.map(p => p.ticket));\nconst setPrevios  = new Set(posicionesPrevias.map(p => p.ticket));\n\nconst eventos = [];\n\nfor (const pos of posicionesActuales) {\n  if (!setPrevios.has(pos.ticket)) {\n    eventos.push({\n      login,\n      name,\n      event: 'open',\n      ticket: pos.ticket,\n      symbol: pos.symbol,\n      volume: pos.volume,\n      direction: pos.action\n    });\n  }\n}\n\nfor (const pos of posicionesPrevias) {\n  if (!setActuales.has(pos.ticket)) {\n    eventos.push({\n      login,\n      name,\n      event: 'close',\n      ticket: pos.ticket,\n      symbol: pos.symbol,\n      volume: pos.volume,\n      direction: pos.action\n    });\n  }\n}\n\nreturn [{ json: { login, name, posicionesActuales, eventos } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        336
+      ],
+      "id": "70196887-e1a3-41a3-9451-be95e348c94c",
+      "name": "Comparar y Detectar Eventos"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=positions:{{ $json.login }}",
+        "value": "={{ JSON.stringify($json.posicionesActuales) }}",
+        "expire": true,
+        "ttl": 1800
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        336
+      ],
+      "id": "747b64ba-375e-4b2c-8972-3edd0ae1a081",
+      "name": "Guardar Estado Actual",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const eventos = $json.eventos;\nif (!eventos || eventos.length === 0) return [];\nreturn eventos.map(e => ({ json: e }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        336
+      ],
+      "id": "9a00f590-4814-4e94-a0cf-61b5e0a6a97f",
+      "name": "¿Hay eventos?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "aabb1122-0001-0001-0001-000000000001",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "open",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1520,
+        336
+      ],
+      "id": "4c7c2c92-f10a-49eb-aba0-ba735096eaed",
+      "name": "¿Open o Close?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login.toString() }}"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            },
+            {
+              "name": "volume",
+              "value": "={{ $json.volume }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1744,
+        240
+      ],
+      "id": "26fc8a41-1eb5-4d10-8bae-2d748b82ce4b",
+      "name": "Alerta Apertura"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login.toString() }}"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            },
+            {
+              "name": "volume",
+              "value": "={{ $json.volume }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1744,
+        432
+      ],
+      "id": "5a2635af-dc7f-46e9-8d14-83f65f7518c0",
+      "name": "Alerta Cierre"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=🔴 *LOGIN MARCADO - APERTURA*\n👤 {{ $json.name }} ({{ $json.login }})\n📈 {{ $json.direction.toUpperCase() }} {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.ticket }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        240
+      ],
+      "id": "4df7876e-c509-4882-a9e4-db61cb2d6ab3",
+      "name": "Telegram Apertura",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=🟢 *LOGIN MARCADO - CIERRE*\n👤 {{ $json.name }} ({{ $json.login }})\n📉 CERRÓ {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.ticket }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1968,
+        432
+      ],
+      "id": "5c2682c9-2e90-437b-a2a9-f5974ebeec4d",
+      "name": "Telegram Cierre",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "86db92f9-25e2-4f7b-92ac-0fa925e6492f",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WebSocket Kynex Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch evento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch evento": {
+      "main": [
+        [
+          {
+            "node": "Guardar Bearer Token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Leer Logins Marcados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Logins Marcados": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Cuentas y Símbolos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Cuentas y Símbolos": {
+      "main": [
+        [
+          {
+            "node": "Leer Estado Anterior",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Estado Anterior": {
+      "main": [
+        [
+          {
+            "node": "Comparar y Detectar Eventos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comparar y Detectar Eventos": {
+      "main": [
+        [
+          {
+            "node": "Guardar Estado Actual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Estado Actual": {
+      "main": [
+        [
+          {
+            "node": "¿Hay eventos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay eventos?": {
+      "main": [
+        [
+          {
+            "node": "¿Open o Close?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Open o Close?": {
+      "main": [
+        [
+          {
+            "node": "Alerta Apertura",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alerta Cierre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alerta Apertura": {
+      "main": [
+        [
+          {
+            "node": "Telegram Apertura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alerta Cierre": {
+      "main": [
+        [
+          {
+            "node": "Telegram Cierre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "c12b2148-764f-464f-8671-47ebf958aa2f",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-28T04:51:05.580Z",
+      "createdAt": "2026-05-28T04:51:05.580Z",
+      "role": "workflow:owner",
+      "workflowId": "vnT2SiMLTBUjh6QL",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
