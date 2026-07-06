@@ -1,0 +1,127 @@
+{
+  "updatedAt": "2026-05-25T14:54:34.379Z",
+  "createdAt": "2026-04-15T15:13:48.383Z",
+  "id": "WGe2uTvnChFVvHuE",
+  "name": "My workflow 3",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "131fab43-ab2a-4dd5-9888-6e3adb8f4581",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1m190QzZe8wLrsFOnw0Cfj-kQCuJUtndxzbN2fsvvN_c",
+          "mode": "list",
+          "cachedResultName": " correos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m190QzZe8wLrsFOnw0Cfj-kQCuJUtndxzbN2fsvvN_c/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1m190QzZe8wLrsFOnw0Cfj-kQCuJUtndxzbN2fsvvN_c/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -32
+      ],
+      "id": "b67def48-09f6-4d67-a826-1b1bccd28f19",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.correo }}",
+        "subject": "MENSAJE PRUEBA",
+        "message": "=<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Bienvenida</title>\n</head>\n<body style=\"margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, sans-serif;\">\n\n  <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f4f6f8; padding:20px 0;\">\n    <tr>\n      <td align=\"center\">\n        \n        <table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.05);\">\n          \n          <!-- Header -->\n          <tr>\n            <td style=\"background:linear-gradient(90deg,#4CAF50,#2ecc71); padding:30px; text-align:center; color:white;\">\n              <h1 style=\"margin:0; font-size:26px;\">¡Bienvenido/a!</h1>\n            </td>\n          </tr>\n\n          <!-- Content -->\n          <tr>\n            <td style=\"padding:30px; color:#555; font-size:16px; line-height:1.6;\">\n              \n              <p style=\"margin-top:0;\">\n                Nos alegra mucho tenerte con nosotros 🎉\n              </p>\n\n              <p>\n                A partir de ahora podrás disfrutar de todos nuestros servicios y beneficios. Estamos aquí para ayudarte en cada paso.\n              </p>\n\n              <p>\n                Si tienes alguna duda o necesitas asistencia, no dudes en contactarnos en cualquier momento.\n              </p>\n\n              <!-- Button -->\n              <div style=\"text-align:center; margin:30px 0;\">\n                <a href=\"#\" style=\"background:#4CAF50; color:white; text-decoration:none; padding:12px 25px; border-radius:25px; font-weight:bold; display:inline-block;\">\n                  Empezar ahora\n                </a>\n              </div>\n\n              <p>\n                Gracias por confiar en nosotros.\n              </p>\n\n              <p style=\"margin-bottom:0;\">\n                <strong>El equipo</strong>\n              </p>\n\n            </td>\n          </tr>\n\n          <!-- Footer -->\n          <tr>\n            <td style=\"background:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#888;\">\n              © 2026 Tu Empresa - Todos los derechos reservados\n            </td>\n          </tr>\n\n        </table>\n\n      </td>\n    </tr>\n  </table>\n\n</body>\n</html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        -32
+      ],
+      "id": "249cdb17-be57-42c8-a5c7-8571d022f16f",
+      "name": "Send a message",
+      "webhookId": "cc029aeb-e4b9-4124-bf37-51725b5e5533",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PCYEfRRv5b3hlqUG",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "a687771f-b452-446b-b3ee-4ad50e8b45ed",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T15:13:48.383Z",
+      "createdAt": "2026-04-15T15:13:48.383Z",
+      "role": "workflow:owner",
+      "workflowId": "WGe2uTvnChFVvHuE",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
