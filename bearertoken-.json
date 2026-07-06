@@ -1,0 +1,316 @@
+{
+  "updatedAt": "2026-05-22T15:57:56.491Z",
+  "createdAt": "2026-05-19T15:22:33.118Z",
+  "id": "buxQbvJ5B90vEFXP",
+  "name": "bearerToken",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "bearerToken",
+        "value": "={{ $json.new_token }}",
+        "expire": true,
+        "ttl": 40000
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        640,
+        32
+      ],
+      "id": "3083064a-0d24-480f-9f33-ef4267ec794f",
+      "name": "getBearer",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apicrm.kynex.trade:11873/pool/token/connect",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            },
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "tipo",
+              "value": "Websockets"
+            },
+            {
+              "name": "ttl_hours",
+              "value": "12"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        32
+      ],
+      "id": "e03c2035-d4e5-4aec-94f6-e0ebc0d499bc",
+      "name": "poolConnect"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        32
+      ],
+      "id": "a82e5d2a-ad2a-4624-8716-1d5800726713",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "poolConnect": {
+      "main": [
+        [
+          {
+            "node": "getBearer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getBearer": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "poolConnect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        9
+      ]
+    }
+  },
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "6961d7f2-126d-4fac-ace6-dd24902effa4",
+  "activeVersionId": "de9ae273-678c-4860-8bf6-9ce3106462a2",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-19T15:22:33.118Z",
+      "createdAt": "2026-05-19T15:22:33.118Z",
+      "role": "workflow:owner",
+      "workflowId": "buxQbvJ5B90vEFXP",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-19T15:23:35.536Z",
+    "createdAt": "2026-05-19T15:23:30.449Z",
+    "versionId": "de9ae273-678c-4860-8bf6-9ce3106462a2",
+    "workflowId": "buxQbvJ5B90vEFXP",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "bearerToken",
+          "value": "={{ $json.new_token }}",
+          "expire": true,
+          "ttl": 40000
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          640,
+          32
+        ],
+        "id": "3083064a-0d24-480f-9f33-ef4267ec794f",
+        "name": "getBearer",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://apicrm.kynex.trade:11873/pool/token/connect",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "accept",
+                "value": "application/json"
+              },
+              {
+                "name": "X-Admin-Token",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              },
+              {
+                "name": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ]
+          },
+          "sendBody": true,
+          "contentType": "multipart-form-data",
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "tipo",
+                "value": "Websockets"
+              },
+              {
+                "name": "ttl_hours",
+                "value": "12"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          432,
+          32
+        ],
+        "id": "e03c2035-d4e5-4aec-94f6-e0ebc0d499bc",
+        "name": "poolConnect"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "6d688af0-9553-4a97-91e1-5ac028af4013",
+                "name": "new_token",
+                "value": "={{ $json.new_token }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          848,
+          32
+        ],
+        "id": "5b7cef7d-2939-44f7-aff7-4773ab18758f",
+        "name": "Return"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          160,
+          32
+        ],
+        "id": "a82e5d2a-ad2a-4624-8716-1d5800726713",
+        "name": "Schedule Trigger"
+      }
+    ],
+    "connections": {
+      "poolConnect": {
+        "main": [
+          [
+            {
+              "node": "getBearer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getBearer": {
+        "main": [
+          [
+            {
+              "node": "Return",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "poolConnect",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version de9ae273",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
