@@ -1,0 +1,515 @@
+{
+  "updatedAt": "2026-05-25T14:55:16.910Z",
+  "createdAt": "2026-05-08T03:43:35.110Z",
+  "id": "DOjBpq7cFQrjiPgs",
+  "name": "Asistente de Citas con IA",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "citas-ia",
+        "options": {}
+      },
+      "id": "node-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        256,
+        304
+      ],
+      "webhookId": "1a8395f7-5cc2-4f72-a908-7c3f08100a95",
+      "notes": "Recibe mensajes de entrada por webhook (puede ser Telegram/WhatsApp)"
+    },
+    {
+      "parameters": {
+        "agent": "toolsAgent",
+        "options": {
+          "systemMessage": "Eres un asistente de citas. Detecta la intención del usuario (agendar, consultar, editar, eliminar), extrae los detalles de la cita (título, fecha, hora inicio/fin, descripción) y usa las herramientas adecuadas. Si faltan datos, pregunta. Confirma antes de modificar o eliminar eventos."
+        }
+      },
+      "id": "node-2",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        480,
+        240
+      ],
+      "notes": "Coordinador principal que decide qué herramientas usar"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "node-3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        240,
+        544
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "OpenAI Credentials"
+        }
+      },
+      "notes": "Modelo de lenguaje para procesar el texto del usuario"
+    },
+    {
+      "parameters": {
+        "sessionKey": "{{$json.sessionId}}"
+      },
+      "id": "node-4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1,
+      "position": [
+        432,
+        544
+      ],
+      "notes": "Guarda los últimos 5 mensajes para contexto"
+    },
+    {
+      "parameters": {
+        "name": "calendarTool",
+        "description": "Herramienta para crear, consultar, editar o eliminar eventos en Google Calendar",
+        "workflowId": {
+          "__rl": true,
+          "value": "CAL_WF_ID",
+          "mode": "id"
+        },
+        "responsePropertyName": "calendarResponse"
+      },
+      "id": "node-5",
+      "name": "Calendar Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1,
+      "position": [
+        560,
+        544
+      ],
+      "notes": "Wrapper para operaciones de Google Calendar"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "="
+      },
+      "id": "node-6",
+      "name": "Switch Intención",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        864,
+        304
+      ],
+      "notes": "Enruta según la intención detectada por la IA"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list"
+        },
+        "start": "{{$json.startTime}}",
+        "end": "{{$json.endTime}}",
+        "additionalFields": {
+          "description": "{{$json.description}}",
+          "summary": "{{$json.title}}"
+        }
+      },
+      "id": "node-7",
+      "name": "Google Calendar Create",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        160
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar Credentials"
+        }
+      },
+      "notes": "Crea nuevo evento en Google Calendar"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list"
+        },
+        "limit": 10,
+        "options": {}
+      },
+      "id": "node-8",
+      "name": "Google Calendar Get",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        304
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar Credentials"
+        }
+      },
+      "notes": "Consulta eventos en un rango de fechas"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list"
+        },
+        "eventId": "{{$json.eventId}}",
+        "updateFields": {
+          "description": "{{$json.newDescription}}",
+          "end": "{{$json.newEndTime}}",
+          "start": "{{$json.newStartTime}}",
+          "summary": "{{$json.newTitle}}"
+        }
+      },
+      "id": "node-9",
+      "name": "Google Calendar Update",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        464
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar Credentials"
+        }
+      },
+      "notes": "Actualiza un evento existente"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "primary",
+          "mode": "list"
+        },
+        "eventId": "{{$json.eventId}}",
+        "options": {}
+      },
+      "id": "node-10",
+      "name": "Google Calendar Delete",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        608
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": null,
+          "name": "Google Calendar Credentials"
+        }
+      },
+      "notes": "Elimina un evento"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "{{$node[\"Google Calendar Create\"].error}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "2",
+              "leftValue": "{{$node[\"Google Calendar Get\"].error}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3",
+              "leftValue": "{{$node[\"Google Calendar Update\"].error}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "4",
+              "leftValue": "{{$node[\"Google Calendar Delete\"].error}}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          }
+        },
+        "options": {}
+      },
+      "id": "node-11",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        304
+      ],
+      "notes": "Detecta errores en operaciones de Calendar"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "node-12",
+      "name": "Respuesta Éxito",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1456,
+        160
+      ],
+      "notes": "Genera mensaje de confirmación"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "node-13",
+      "name": "Respuesta Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        1456,
+        464
+      ],
+      "notes": "Genera mensaje de error"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{{message: $json.message}}}",
+        "options": {}
+      },
+      "id": "node-14",
+      "name": "Responder al Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        304
+      ],
+      "notes": "Envía respuesta por el mismo canal"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch Intención",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Intención": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar Create",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [],
+        []
+      ]
+    },
+    "Google Calendar Create": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar Get": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar Update": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar Delete": {
+      "main": [
+        [
+          {
+            "node": "Error Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Handler": {
+      "main": [
+        [
+          {
+            "node": "Respuesta Éxito",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Error",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Respuesta Éxito": {
+      "main": [
+        [
+          {
+            "node": "Responder al Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respuesta Error": {
+      "main": [
+        [
+          {
+            "node": "Responder al Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "b4e98856-bc17-4f60-a473-3b4a810c7c94",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T03:43:35.110Z",
+      "createdAt": "2026-05-08T03:43:35.110Z",
+      "role": "workflow:owner",
+      "workflowId": "DOjBpq7cFQrjiPgs",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
