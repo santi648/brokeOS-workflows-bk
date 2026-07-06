@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2026-05-25T14:53:20.161Z",
+  "createdAt": "2026-05-14T06:09:14.387Z",
+  "id": "f6UNvPbQhSvqwLvh",
+  "name": "🔍 Debug - Ver tabla variables n8n",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "81180b24-94ab-4776-b60a-6215bbba9952",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "2babbd8b-b52f-4951-89c2-811790fe43ec",
+      "name": "Ver tabla variables",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, key, type, value, \"projectId\" FROM variables ORDER BY key;"
+      },
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Ver tabla variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "a759241b-bc95-401e-a2ef-019cdc5e03a4",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T06:09:14.387Z",
+      "createdAt": "2026-05-14T06:09:14.387Z",
+      "role": "workflow:owner",
+      "workflowId": "f6UNvPbQhSvqwLvh",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
