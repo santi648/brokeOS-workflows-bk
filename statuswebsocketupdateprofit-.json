@@ -1,0 +1,368 @@
+{
+  "updatedAt": "2026-06-11T17:56:36.934Z",
+  "createdAt": "2026-06-01T15:37:07.503Z",
+  "id": "OJcZn21ToiVhrvCK",
+  "name": "statusWebsocketUpdateProfit",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "execution",
+        "limit": 10,
+        "filters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "1m6Rb043oPBfFSMj",
+            "mode": "list",
+            "cachedResultName": "WebsocketPostionsProd (#1m6Rb043oPBfFSMj)"
+          }
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        640,
+        272
+      ],
+      "id": "6688beae-fec3-4f03-8113-e789806d2499",
+      "name": "Get Executions",
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflowNode = $('Get a workflow version1').item.json;\nconst executions = $input.all().map(i => i.json);\n\nconst now = new Date();\nconst STUCK_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutos\n\n// Clasifica ejecuciones\nconst succeeded = executions.filter(e => e.status === 'success');\nconst failed = executions.filter(e => e.status === 'error');\nconst running = executions.filter(e => e.status === 'running');\n\n// Detecta ejecuciones colgadas (running por más de STUCK_THRESHOLD_MS)\nconst stuckExecutions = running.filter(e => {\n  const started = new Date(e.startedAt);\n  return (now - started) > STUCK_THRESHOLD_MS;\n});\n\n// Última ejecución exitosa\nconst lastSuccess = succeeded.length > 0\n  ? succeeded.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0]\n  : null;\n\n// Minutos desde el último éxito\nconst minutesSinceLastSuccess = lastSuccess\n  ? Math.round((now - new Date(lastSuccess.startedAt)) / 60000)\n  : null;\n\n// Nivel de alerta\nlet alertLevel = 'ok';\nif (!workflowNode.active) {\n  alertLevel = 'critical';\n} else if (stuckExecutions.length > 0) {\n  alertLevel = 'critical';\n} else if (failed.length > succeeded.length) {\n  alertLevel = 'warning';\n} else if (minutesSinceLastSuccess !== null && minutesSinceLastSuccess > 30) {\n  alertLevel = 'warning';\n}\n\nreturn [{\n  json: {\n    workflow: workflowNode.name,\n    active: workflowNode.active,\n    alertLevel,\n    successRate: `${succeeded.length}/${executions.length}`,\n    stuckExecutions: stuckExecutions.map(e => ({ id: e.id, startedAt: e.startedAt })),\n    hasStuckExecution: stuckExecutions.length > 0,\n    lastSuccessAt: lastSuccess ? lastSuccess.startedAt : null,\n    minutesSinceLastSuccess,\n    recentExecutions: executions.map(e => ({\n      id: e.id,\n      status: e.status,\n      startedAt: e.startedAt,\n      finished: e.finished\n    }))\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        272
+      ],
+      "id": "d66eb4cb-e560-4fbd-9591-7f242b46e855",
+      "name": "Analyze Metrics"
+    },
+    {
+      "parameters": {
+        "path": "cc5b3eca-60b3-4adf-8a29-a3334d7a7025",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        272
+      ],
+      "id": "96242a4e-22f0-4abd-ba86-f478199a5088",
+      "name": "Webhook1",
+      "webhookId": "cc5b3eca-60b3-4adf-8a29-a3334d7a7025"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "workflowId": {
+          "__rl": true,
+          "value": "1m6Rb043oPBfFSMj",
+          "mode": "list",
+          "cachedResultName": "WebsocketPostionsProd (#1m6Rb043oPBfFSMj)"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        448,
+        272
+      ],
+      "id": "8ab7d95d-e848-41b9-8d6f-2babc8cb8c3f",
+      "name": "Get a workflow version1",
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json, null, 2) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1040,
+        272
+      ],
+      "id": "d37fe613-cb16-4bb6-ba70-5ca300303b0b",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "resource": "execution",
+        "filters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "1m6Rb043oPBfFSMj",
+            "mode": "list",
+            "cachedResultName": "WebsocketPostionsProd (#1m6Rb043oPBfFSMj)"
+          },
+          "status": "error"
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.n8n",
+      "typeVersion": 1,
+      "position": [
+        576,
+        544
+      ],
+      "id": "65c7fa9e-1f44-4331-8205-78e1c90bad48",
+      "name": "Get Executions1",
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get Executions": {
+      "main": [
+        [
+          {
+            "node": "Analyze Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Metrics": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Get a workflow version1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a workflow version1": {
+      "main": [
+        [
+          {
+            "node": "Get Executions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "26ad94a2-8039-47eb-b756-184c991b6e91",
+  "activeVersionId": "601c144e-5543-4967-a1e4-f2180e48e977",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T15:37:07.503Z",
+      "createdAt": "2026-06-01T15:37:07.503Z",
+      "role": "workflow:owner",
+      "workflowId": "OJcZn21ToiVhrvCK",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-01T16:49:43.989Z",
+    "createdAt": "2026-06-01T16:42:56.813Z",
+    "versionId": "601c144e-5543-4967-a1e4-f2180e48e977",
+    "workflowId": "OJcZn21ToiVhrvCK",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "execution",
+          "limit": 10,
+          "filters": {
+            "workflowId": {
+              "__rl": true,
+              "value": "1m6Rb043oPBfFSMj",
+              "mode": "list",
+              "cachedResultName": "WebsocketPostionsProd (#1m6Rb043oPBfFSMj)"
+            }
+          },
+          "options": {},
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          640,
+          272
+        ],
+        "id": "6688beae-fec3-4f03-8113-e789806d2499",
+        "name": "Get Executions",
+        "credentials": {
+          "n8nApi": {
+            "id": "VfIKJBsNihAATKHc",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const workflowNode = $('Get a workflow version1').item.json;\nconst executions = $input.all().map(i => i.json);\n\nconst now = new Date();\nconst STUCK_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutos\n\n// Clasifica ejecuciones\nconst succeeded = executions.filter(e => e.status === 'success');\nconst failed = executions.filter(e => e.status === 'error');\nconst running = executions.filter(e => e.status === 'running');\n\n// Detecta ejecuciones colgadas (running por más de STUCK_THRESHOLD_MS)\nconst stuckExecutions = running.filter(e => {\n  const started = new Date(e.startedAt);\n  return (now - started) > STUCK_THRESHOLD_MS;\n});\n\n// Última ejecución exitosa\nconst lastSuccess = succeeded.length > 0\n  ? succeeded.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))[0]\n  : null;\n\n// Minutos desde el último éxito\nconst minutesSinceLastSuccess = lastSuccess\n  ? Math.round((now - new Date(lastSuccess.startedAt)) / 60000)\n  : null;\n\n// Nivel de alerta\nlet alertLevel = 'ok';\nif (!workflowNode.active) {\n  alertLevel = 'critical';\n} else if (stuckExecutions.length > 0) {\n  alertLevel = 'critical';\n} else if (failed.length > succeeded.length) {\n  alertLevel = 'warning';\n} else if (minutesSinceLastSuccess !== null && minutesSinceLastSuccess > 30) {\n  alertLevel = 'warning';\n}\n\nreturn [{\n  json: {\n    workflow: workflowNode.name,\n    active: workflowNode.active,\n    alertLevel,\n    successRate: `${succeeded.length}/${executions.length}`,\n    stuckExecutions: stuckExecutions.map(e => ({ id: e.id, startedAt: e.startedAt })),\n    hasStuckExecution: stuckExecutions.length > 0,\n    lastSuccessAt: lastSuccess ? lastSuccess.startedAt : null,\n    minutesSinceLastSuccess,\n    recentExecutions: executions.map(e => ({\n      id: e.id,\n      status: e.status,\n      startedAt: e.startedAt,\n      finished: e.finished\n    }))\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          848,
+          272
+        ],
+        "id": "d66eb4cb-e560-4fbd-9591-7f242b46e855",
+        "name": "Analyze Metrics"
+      },
+      {
+        "parameters": {
+          "path": "cc5b3eca-60b3-4adf-8a29-a3334d7a7025",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          240,
+          272
+        ],
+        "id": "96242a4e-22f0-4abd-ba86-f478199a5088",
+        "name": "Webhook1",
+        "webhookId": "cc5b3eca-60b3-4adf-8a29-a3334d7a7025"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "workflowId": {
+            "__rl": true,
+            "value": "1m6Rb043oPBfFSMj",
+            "mode": "list",
+            "cachedResultName": "WebsocketPostionsProd (#1m6Rb043oPBfFSMj)"
+          },
+          "requestOptions": {}
+        },
+        "type": "n8n-nodes-base.n8n",
+        "typeVersion": 1,
+        "position": [
+          448,
+          272
+        ],
+        "id": "8ab7d95d-e848-41b9-8d6f-2babc8cb8c3f",
+        "name": "Get a workflow version1",
+        "credentials": {
+          "n8nApi": {
+            "id": "VfIKJBsNihAATKHc",
+            "name": "n8n account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify($json, null, 2) }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          1040,
+          272
+        ],
+        "id": "d37fe613-cb16-4bb6-ba70-5ca300303b0b",
+        "name": "Respond to Webhook1"
+      }
+    ],
+    "connections": {
+      "Get Executions": {
+        "main": [
+          [
+            {
+              "node": "Analyze Metrics",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Analyze Metrics": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook1": {
+        "main": [
+          [
+            {
+              "node": "Get a workflow version1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get a workflow version1": {
+        "main": [
+          [
+            {
+              "node": "Get Executions",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 601c144e",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
