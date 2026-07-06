@@ -1,0 +1,151 @@
+{
+  "updatedAt": "2026-06-23T08:11:13.623Z",
+  "createdAt": "2026-06-04T17:33:03.777Z",
+  "id": "NBhqPX3UYIECJodC",
+  "name": "mailChimp",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "binaryPropertyName": "={{ $input.item.binary.ingrese_csv }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        0
+      ],
+      "id": "7fc32283-626a-48ff-992a-9a45b28b5829",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "formTitle": "PRUEBA",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "ingrese csv",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3c4e8057-700f-488a-a20e-765a609acac3",
+      "name": "On form submission",
+      "webhookId": "b43b2664-b6f1-4a93-bf1c-32980dec0cfb"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log($input.all())\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "b8a2b7b9-f050-4197-97f3-b913706cf606",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Extract from File": {
+      "main": [
+        []
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "ingrese csv": [
+            {
+              "filename": "CSV Campañas.csv",
+              "mimetype": "text/csv",
+              "size": 1011
+            }
+          ],
+          "submittedAt": "2026-06-09T10:47:09.073-05:00",
+          "formMode": "test"
+        },
+        "binary": {
+          "ingrese_csv": {
+            "mimeType": "text/csv",
+            "fileType": "text",
+            "fileExtension": "csv",
+            "data": "database",
+            "fileName": "CSV Campañas.csv",
+            "id": "database:b1feeae2-fe4d-4135-8065-ef80ee5ee9b8",
+            "fileSize": "1.01 kB",
+            "bytes": 1011
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "a5e27e43-552a-46a6-a49f-10da6774b9d1",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T17:33:03.777Z",
+      "createdAt": "2026-06-04T17:33:03.777Z",
+      "role": "workflow:owner",
+      "workflowId": "NBhqPX3UYIECJodC",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": [
+    {
+      "updatedAt": "2026-06-04T17:23:04.707Z",
+      "createdAt": "2026-06-04T17:23:04.707Z",
+      "id": "U83PTXycoRQHQxgE",
+      "name": "marketingGmail"
+    }
+  ]
+}
