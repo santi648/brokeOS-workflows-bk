@@ -1,0 +1,458 @@
+{
+  "updatedAt": "2026-06-23T00:28:57.721Z",
+  "createdAt": "2026-05-13T14:34:48.542Z",
+  "id": "5QNe3pRssyMiUiKZ",
+  "name": "accessTokenApiKey",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "accessToken",
+        "value": "={{ $json.data.access_token }}",
+        "expire": true,
+        "ttl": 360
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -368
+      ],
+      "id": "ae251f82-4cb4-444d-9ea2-2399c5fc4a13",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://transactionalapi.branchtech.co/dev/api/v1/auth/api-key/session",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "=X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "api_key",
+              "value": "bk_pQgOCkpH-st00zb-_sKWlxQdaOAFgM-KCr95KiPP1og"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        -368
+      ],
+      "id": "c0511d62-a625-4d47-9192-a00e07c30f48",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "waitBetweenTries": 500
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        -368
+      ],
+      "name": "Call integridadDatos",
+      "id": "6049248f-3a25-469e-b7e8-e9860ec7ff56"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "/api/v1/auth/api-key/session",
+              "type": "string"
+            },
+            {
+              "id": "4b53b563-f084-4b7b-81eb-f427d8d327d6",
+              "name": "body_json",
+              "value": "={{ JSON.stringify({ \"api_key\":\"bk_pQgOCkpH-st00zb-_sKWlxQdaOAFgM-KCr95KiPP1og\" })}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -176,
+        -416
+      ],
+      "id": "5cd30f0c-d6b4-4fd8-900a-4019a2dcff4c",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        -368
+      ],
+      "id": "7f241076-6bc5-4b11-8987-828c0ca42144",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "Redis": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-06-22T19:25:56.002-05:00",
+          "Readable date": "June 22nd 2026, 7:25:56 pm",
+          "Readable time": "7:25:56 pm",
+          "Day of week": "Monday",
+          "Year": "2026",
+          "Month": "June",
+          "Day of month": "22",
+          "Hour": "19",
+          "Minute": "25",
+          "Second": "56",
+          "Timezone": "America/Bogota (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "b0e4fa64-baaa-4aad-93fa-f2e4d696a001",
+  "activeVersionId": "b0e4fa64-baaa-4aad-93fa-f2e4d696a001",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-13T14:34:48.542Z",
+      "createdAt": "2026-05-13T14:34:48.542Z",
+      "role": "workflow:owner",
+      "workflowId": "5QNe3pRssyMiUiKZ",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-23T00:28:59.117Z",
+    "createdAt": "2026-06-23T00:28:57.722Z",
+    "versionId": "b0e4fa64-baaa-4aad-93fa-f2e4d696a001",
+    "workflowId": "5QNe3pRssyMiUiKZ",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "accessToken",
+          "value": "={{ $json.data.access_token }}",
+          "expire": true,
+          "ttl": 360
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          720,
+          -368
+        ],
+        "id": "ae251f82-4cb4-444d-9ea2-2399c5fc4a13",
+        "name": "Redis",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://transactionalapi.branchtech.co/dev/api/v1/auth/api-key/session",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-Timestamp",
+                "value": "={{ $json[\"X-Timestamp\"] }}"
+              },
+              {
+                "name": "=X-Nonce",
+                "value": "={{ $json[\"X-Nonce\"] }}"
+              },
+              {
+                "name": "X-Signature",
+                "value": "={{ $json[\"X-Signature\"] }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "api_key",
+                "value": "bk_pQgOCkpH-st00zb-_sKWlxQdaOAFgM-KCr95KiPP1og"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          416,
+          -368
+        ],
+        "id": "c0511d62-a625-4d47-9192-a00e07c30f48",
+        "name": "HTTP Request",
+        "retryOnFail": true,
+        "waitBetweenTries": 500
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hNkfZRxj5g8aESFu",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+            "cachedResultName": "integridadDatos"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          112,
+          -368
+        ],
+        "name": "Call integridadDatos",
+        "id": "6049248f-3a25-469e-b7e8-e9860ec7ff56"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d32afad5-755a-4d9f-b105-140afb230324",
+                "name": "path",
+                "value": "/api/v1/auth/api-key/session",
+                "type": "string"
+              },
+              {
+                "id": "4b53b563-f084-4b7b-81eb-f427d8d327d6",
+                "name": "body_json",
+                "value": "={{ JSON.stringify({ \"api_key\":\"bk_pQgOCkpH-st00zb-_sKWlxQdaOAFgM-KCr95KiPP1og\" })}}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -176,
+          -416
+        ],
+        "id": "5cd30f0c-d6b4-4fd8-900a-4019a2dcff4c",
+        "name": "path"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -464,
+          -368
+        ],
+        "id": "7f241076-6bc5-4b11-8987-828c0ca42144",
+        "name": "Schedule Trigger"
+      }
+    ],
+    "connections": {
+      "Redis": {
+        "main": [
+          []
+        ]
+      },
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "Redis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call integridadDatos": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "path": {
+        "main": [
+          [
+            {
+              "node": "Call integridadDatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "path",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version b0e4fa64",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
