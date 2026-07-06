@@ -1,0 +1,221 @@
+{
+  "updatedAt": "2026-05-25T14:54:26.239Z",
+  "createdAt": "2026-04-15T05:11:52.710Z",
+  "id": "J49QjXL5MImNXa05",
+  "name": "My workflow 2",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2dac3c94-1006-408f-8457-d491a03b3713",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        -64
+      ],
+      "id": "461ba3a0-5544-41fb-9124-1705ac6fbcfe",
+      "name": "Webhook",
+      "webhookId": "2dac3c94-1006-408f-8457-d491a03b3713"
+    },
+    {
+      "parameters": {
+        "sendTo": "lspardo@uniboyaca.edu.co",
+        "subject": "PRECIO ",
+        "message": "=hola amigo , el precio del es de {{ $json.body.price }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -96
+      ],
+      "id": "d7d735f1-9ee4-45c7-ab79-3422edadaab3",
+      "name": "Send a message",
+      "webhookId": "570286c1-daf1-4a0a-b765-03fc27287dd5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PCYEfRRv5b3hlqUG",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "5260c07b-a25a-4bc3-b3be-10e65968bf15",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T05:11:52.710Z",
+      "createdAt": "2026-04-15T05:11:52.710Z",
+      "role": "workflow:owner",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "YlWHwxOGxcFi2H90"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "4e6d711ba6ecd4d6"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "c0676828c890b1fb"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "dfb151f802b3201c"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "a30a0eeda4fbd285"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "f844ab80966909a8"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "a5a5cbde0f822c3e"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "3d334aab917b3886"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "bdcac45d10f7b9c1"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "e7d2fef3e9b54ef5"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "1a90a19cd2dc22c0"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "27ccf33e9f52347d"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "d47e2a7b151d6ed3"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "541db4859e365e49"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "a783d86bc75549c1"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "e07501ebdd899ab9"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "d2ee15b3e9d9fdc0"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "c16b68ab4f5d4dac"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "19d5343d548b9c60"
+    },
+    {
+      "updatedAt": "2026-06-05T19:12:14.654Z",
+      "createdAt": "2026-06-05T19:12:14.654Z",
+      "role": "workflow:editor",
+      "workflowId": "J49QjXL5MImNXa05",
+      "projectId": "933f05c6b02fea1c"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
