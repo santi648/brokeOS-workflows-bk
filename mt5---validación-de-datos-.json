@@ -1,0 +1,457 @@
+{
+  "updatedAt": "2026-05-25T14:52:43.306Z",
+  "createdAt": "2026-05-20T03:47:06.652Z",
+  "id": "wyUm0DQzvKBlUpfb",
+  "name": "MT5 - Validación de datos",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_login",
+              "type": "any"
+            },
+            {
+              "name": "apiKey",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "51119286-1390-4fb8-85a8-7a764148a93c",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bearerToken",
+        "key": "bearerToken",
+        "options": {}
+      },
+      "id": "ce88e354-bdeb-42d7-889c-63bbf8c2fe11",
+      "name": "getBearer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "28dcd55a-1ba4-4aaf-84a6-a27feafa13b6",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "accessToken",
+        "key": "accessToken",
+        "options": {}
+      },
+      "id": "38229980-006b-4073-af6d-2c62a4e9c349",
+      "name": "Redis",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        224,
+        192
+      ],
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "2dcaf5d2-0ac1-4754-91f8-ca04661e67ef",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        672,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "43b7bfcd-9356-4740-b452-40503cb620a9",
+      "name": "accTokandBearer",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://apicrm.kynex.trade:11873/users/{{ $('Start').item.json.message_login }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d782fc68-c662-48e7-8c96-f646d2a6495c",
+      "name": "getUsersInfo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-login",
+              "leftValue": "={{ $json.login }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-ip",
+              "leftValue": "={{ $json.LastIP }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-computer-id",
+              "leftValue": "={{ $json.ComputerID }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e77b63ba-5205-48de-be7f-be750af70a2c",
+      "name": "Validar datos MT5",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ef3640a4-dccd-4d2b-b251-fd8930908506",
+      "name": "path",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1584,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "7a7ba127-4165-4721-ae5a-699b1275448f",
+      "name": "Call integridadDatos",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1808,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-trading-accounts/connections",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('accTokandBearer').item.json.accessToken }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json['X-Timestamp'] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json['X-Nonce'] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json['X-Signature'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "login",
+              "value": "={{ $('getUsersInfo').item.json.login }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $('getUsersInfo').item.json.LastIP }}"
+            },
+            {
+              "name": "mqid",
+              "value": "={{ $('getUsersInfo').item.json.MQID }}"
+            },
+            {
+              "name": "computer_id",
+              "value": "={{ $('getUsersInfo').item.json.ComputerID ? String($('getUsersInfo').item.json.ComputerID) : '' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d3567ace-1c9a-46b7-865f-226cbd954549",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2032,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "71e0ab07-425d-4f62-a784-5ca80752f3ad",
+      "name": "Log - Datos inválidos",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1616,
+        208
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "getBearer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getBearer": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "accTokandBearer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "accTokandBearer": {
+      "main": [
+        [
+          {
+            "node": "getUsersInfo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getUsersInfo": {
+      "main": [
+        [
+          {
+            "node": "Validar datos MT5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar datos MT5": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log - Datos inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "be77ef67-ff26-4eaf-86e4-acada46a070e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-20T03:47:06.652Z",
+      "createdAt": "2026-05-20T03:47:06.652Z",
+      "role": "workflow:owner",
+      "workflowId": "wyUm0DQzvKBlUpfb",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
