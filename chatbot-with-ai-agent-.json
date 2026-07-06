@@ -1,0 +1,34 @@
+{
+  "updatedAt": "2026-06-23T08:59:45.902Z",
+  "createdAt": "2026-05-11T06:59:22.082Z",
+  "id": "BvHXWULVrTXLoRyh",
+  "name": "Chatbot with AI Agent",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "00afd7a7-a27e-4724-ab6c-fed37425dae2",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T06:59:22.082Z",
+      "createdAt": "2026-05-11T06:59:22.082Z",
+      "role": "workflow:owner",
+      "workflowId": "BvHXWULVrTXLoRyh",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
