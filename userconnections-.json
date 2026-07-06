@@ -1,0 +1,789 @@
+{
+  "updatedAt": "2026-05-22T15:57:51.876Z",
+  "createdAt": "2026-05-15T12:59:33.990Z",
+  "id": "0lCBqR0bIVBKfb4T",
+  "name": "userConnections",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_login",
+              "type": "any"
+            },
+            {
+              "name": "apiKey",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "ba186c78-d34d-4062-b433-6bcb9a474001",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -224,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        96
+      ],
+      "name": "Call integridadDatos",
+      "id": "17a9a052-a1ed-497c-b0c6-443f5fd7420a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/admin/mt5-trading-accounts/connections",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "={{ JSON.stringify(\n{\n\"login\":$json.login,\n\"ip\" : $json.LastIP,\n\"mqid\": $json.MQID,\n\"computer_id\" : $json.ComputerID\n}\n) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        96
+      ],
+      "id": "02af5d35-3aeb-4eed-9cf1-dc4a569b929b",
+      "name": "path"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bearerToken",
+        "key": "bearerToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bc9179ee-6bed-44bb-a57a-e12a1c8270d3",
+      "name": "getBearer",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "accessToken",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        0,
+        192
+      ],
+      "id": "2fa678a3-707e-43df-b03b-e65da68323a2",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        224,
+        96
+      ],
+      "id": "e063bd3e-e117-44ef-b5b0-e4ebbf807577",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ce1de03b-8a17-4c15-b5fb-8efbd4ad0798",
+              "name": "bearerToken",
+              "value": "={{ $json.data[0].bearerToken }}",
+              "type": "string"
+            },
+            {
+              "id": "a1c001ac-0eef-47e0-a6a8-43f43a409d16",
+              "name": "accessToken",
+              "value": "={{ $json.data[1].accessToken }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        96
+      ],
+      "id": "e07155ca-1719-4ca4-85cc-63c37f9558a9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        448,
+        96
+      ],
+      "id": "dcc19e11-2b44-4293-99c6-641f328226e4",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "url": "=https://apicrm.kynex.trade:11873/users/{{ $('Start').item.json.message_login }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        96
+      ],
+      "id": "829b4724-df84-40cd-98d0-7061525126d2",
+      "name": "getLoginData"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-trading-accounts/connections",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Edit Fields').item.json.accessToken }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "login",
+              "value": "={{ $('getLoginData').item.json.login }}"
+            },
+            {
+              "name": "ip",
+              "value": "={{ $('getLoginData').item.json.LastIP }}"
+            },
+            {
+              "name": "mqid",
+              "value": "={{ $('getLoginData').item.json.MQID }}"
+            },
+            {
+              "name": "computer_id",
+              "value": "={{ $('getLoginData').item.json.ComputerID ? String($('getLoginData').item.json.ComputerID ) : \"\" }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1568,
+        96
+      ],
+      "id": "90c0bbc6-3372-4951-a69b-a53d25abe6b2",
+      "name": "PostConnections"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "getBearer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos": {
+      "main": [
+        [
+          {
+            "node": "PostConnections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "path": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getBearer": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "getLoginData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getLoginData": {
+      "main": [
+        [
+          {
+            "node": "path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "25ae6429-aa75-4c7b-b20c-c2e51b35d58b",
+  "activeVersionId": "ef7b7baa-8f9a-4583-aa65-798f92f6153f",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-15T12:59:33.990Z",
+      "createdAt": "2026-05-15T12:59:33.990Z",
+      "role": "workflow:owner",
+      "workflowId": "0lCBqR0bIVBKfb4T",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-20T04:02:15.318Z",
+    "createdAt": "2026-05-20T04:02:12.829Z",
+    "versionId": "ef7b7baa-8f9a-4583-aa65-798f92f6153f",
+    "workflowId": "0lCBqR0bIVBKfb4T",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "message_login",
+                "type": "any"
+              }
+            ]
+          }
+        },
+        "id": "423e467c-6eb7-423e-9037-1c5792189c8f",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -304,
+          -64
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hNkfZRxj5g8aESFu",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+            "cachedResultName": "integridadDatos"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          1264,
+          -64
+        ],
+        "name": "Call integridadDatos",
+        "id": "931fa5ab-45b4-404b-88a3-85f2a9ea0d01"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d32afad5-755a-4d9f-b105-140afb230324",
+                "name": "path",
+                "value": "=/api/v1/admin/mt5-trading-accounts/connections",
+                "type": "string"
+              },
+              {
+                "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+                "name": "body_json",
+                "value": "={{ JSON.stringify(\n{\n\"login\":$json.login,\n\"ip\" : $json.LastIP,\n\"mqid\": $json.MQID,\n\"computer_id\" : $json.ComputerID\n}\n) }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1040,
+          -64
+        ],
+        "id": "836ffebb-6773-49cd-9a38-8fff44fb413c",
+        "name": "path"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://transactionalapi.branchtech.co/dev/api/v1/admin/mt5-trading-accounts/connections",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('accTokandBearer').item.json.accessToken }}"
+              },
+              {
+                "name": "X-Timestamp",
+                "value": "={{ $json[\"X-Timestamp\"] }}"
+              },
+              {
+                "name": "X-Nonce",
+                "value": "={{ $json[\"X-Nonce\"] }}"
+              },
+              {
+                "name": "X-Signature",
+                "value": "={{ $json[\"X-Signature\"] }}"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "login",
+                "value": "={{ $('getUsersInfo').item.json.login }}"
+              },
+              {
+                "name": "ip",
+                "value": "={{ $('getUsersInfo').item.json.LastIP }}"
+              },
+              {
+                "name": "mqid",
+                "value": "={{ $('getUsersInfo').item.json.MQID }}"
+              },
+              {
+                "name": "computer_id",
+                "value": "={{ $('getUsersInfo').item.json.ComputerID ? String($('getUsersInfo').item.json.ComputerID ) : \"\" }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1488,
+          -64
+        ],
+        "id": "0a3a02a2-c1a1-4325-96aa-2be6563c728b",
+        "name": "HTTP Request1"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "bearerToken",
+          "key": "bearerToken",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -80,
+          -160
+        ],
+        "id": "d0ad2f9e-7c01-4f57-b9df-4eab68ac148c",
+        "name": "getBearer",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "accessToken",
+          "key": "accessToken",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -80,
+          32
+        ],
+        "id": "c6728d69-fd5d-458a-94c7-0eb875754046",
+        "name": "Redis",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          144,
+          -64
+        ],
+        "id": "344f36a9-16c4-456f-be7d-7c1e4d77315f",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          368,
+          -64
+        ],
+        "id": "5dae98dc-7c89-4e7e-a38a-8375517a4cd7",
+        "name": "Aggregate"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ce1de03b-8a17-4c15-b5fb-8efbd4ad0798",
+                "name": "bearerToken",
+                "value": "={{ $json.data[0].bearerToken }}",
+                "type": "string"
+              },
+              {
+                "id": "a1c001ac-0eef-47e0-a6a8-43f43a409d16",
+                "name": "accessToken",
+                "value": "={{ $json.data[1].accessToken }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          592,
+          -64
+        ],
+        "id": "657d7c41-152b-4305-8b0f-122b0a555eec",
+        "name": "accTokandBearer"
+      },
+      {
+        "parameters": {
+          "url": "=https://apicrm.kynex.trade:11873/users/{{ $('Start').item.json.message_login }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "accept",
+                "value": "application/json"
+              },
+              {
+                "name": "X-Admin-Token",
+                "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+              },
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.bearerToken }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          816,
+          -64
+        ],
+        "id": "25bdd2ae-03cc-483f-b39f-32cbdb8eb5d4",
+        "name": "getUsersInfo"
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "getBearer",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Redis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "path": {
+        "main": [
+          [
+            {
+              "node": "Call integridadDatos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call integridadDatos": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getBearer": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Aggregate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate": {
+        "main": [
+          [
+            {
+              "node": "accTokandBearer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "accTokandBearer": {
+        "main": [
+          [
+            {
+              "node": "getUsersInfo",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getUsersInfo": {
+        "main": [
+          [
+            {
+              "node": "path",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version ef7b7baa",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
