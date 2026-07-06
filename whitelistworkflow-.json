@@ -1,0 +1,1439 @@
+{
+  "updatedAt": "2026-07-03T16:37:12.495Z",
+  "createdAt": "2026-05-29T18:21:07.824Z",
+  "id": "c0sV2K39sM9bBvYc",
+  "name": "whiteListWorkflow",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Recibe TODOS los items CLOSE del Switch de una vez\nconst closeItems = $input.all();\nconst rawSnapshot = $('Redis_Snapshot3').first().json;\n\nconst byLogin = {};\n\nfor (const item of closeItems) {\n  const loginCierre = String(item.json.login);\n\n  for (const [key, rawValue] of Object.entries(rawSnapshot)) {\n    if (!key.startsWith('pos:')) continue;\n    const parts = key.split(':');\n    if (parts[1] !== loginCierre) continue;\n\n    const redisData = JSON.parse(rawValue);\n\n    if (!byLogin[loginCierre]) {\n      byLogin[loginCierre] = {\n        login: loginCierre,\n        unix_stamp: redisData.unix_stamp,\n        positions: []\n      };\n    } else if (redisData.unix_stamp < byLogin[loginCierre].unix_stamp) {\n      byLogin[loginCierre].unix_stamp = redisData.unix_stamp;\n    }\n\n    byLogin[loginCierre].positions.push({\n      key,\n      position_id: String(redisData.position_id),\n      symbol: redisData.symbol\n    });\n  }\n}\n\nreturn Object.values(byLogin).map(entry => ({ json: entry }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        1904
+      ],
+      "id": "be598eed-b316-4e28-9467-f7c729146040",
+      "name": "Code in JavaScript7",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bearerToken",
+        "key": "bearerProductionPositions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        1904
+      ],
+      "id": "eecf5de1-9e5d-4933-b6b1-53e8ef0ef246",
+      "name": "Redis_Bearer",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2304,
+        1904
+      ],
+      "id": "dd2f9665-73d7-405d-aefa-a13622aba108",
+      "name": "openedOrders"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript8').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const { login, positions } = prev;\n\n  return positions.flatMap(pos => {\n    const order = orders.find(o => String(o.position_id) === String(pos.position_id));\n\n    if (!order) return [];\n    if (order.time_close === 0 || order.time_close === null) return [];\n\n    return [{\n      json: {\n        login,\n        position_id:   String(pos.position_id),\n        symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? pos.symbol,\n        volume:        order.deal_internal_out?.lots ?? order.lots,\n        estado_cierre: \"CONFIRMADO\",\n        key:           pos.key\n      }\n    }];\n  });\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2528,
+        1904
+      ],
+      "id": "6b6d53e5-d705-41db-80bd-66722de0936a",
+      "name": "Code_VerifyClose"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        1904
+      ],
+      "id": "4b2f27ae-1256-4515-a513-11b56b856473",
+      "name": "Redis_DeleteClose",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allBearer = $input.all();\nconst allPrev = $('Code in JavaScript7').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:      prev.login,\n      unix_stamp: prev.unix_stamp,\n      positions:  prev.positions,  // ← array completo\n      bearerToken\n    }\n  };\n}).filter(Boolean);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        1904
+      ],
+      "id": "ba4ff548-4231-4d37-8583-9c3350f6d4a1",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Start').first().json.message_firstItem;\nconst accounts = data.accounts;\n\nconst rawMarcados = $('whiteListProduccion').first().json.propertyName;\nconst listaLogins = JSON.parse(rawMarcados).map(l => String(l));\n\nconst removedLogins = (data.removed_logins ?? []).map(l => String(l));\n\n// Snapshot de Redis — todas las keys pos:login:position_id activas\nconst rawSnapshot = $('Redis_Snapshot3').first().json;\nconst redisKeys = Object.keys(rawSnapshot).filter(k => k.startsWith('pos:'));\n\nconst symbolsAllowed = [\n  \"BearX1000.\",\"BearX400.\",\"BearX500.\",\"BearX777.\",\"BearX900.\",\n  \"BullX1000.\",\"BullX400.\",\"BullX500.\",\"BullX777.\",\"BullX900.\",\n  \"EmasVol10\",\"EmasVol100\",\"EmasVol20\",\"EmasVol30\",\"EmasVol40\",\n  \"EmasVol50\",\"EmasVol60\",\"EmasVol70\",\"EmasVol80\",\"EmasVol90\",\n  \"FomoX111.\",\"FomoX333.\",\"FomoX555.\",\"FomoX888.\",\"FomoX999.\",\n  \"FomoXpeed100.\",\"Fortune100.\",\"Fortune1000.\",\"Fortune250.\",\n  \"Fortune500.\",\"FortuneX200.\",\"FortuneX300.\",\"FortuneX500.\",\n  \"LionX100\",\"LionX120\",\"LionX150\",\"LionX200\",\"LionX25\",\n  \"LionX40\",\"LionX50\",\"LionX60\",\"LionX75\",\"LionX90\",\n  \"VorteX100.\",\"VorteX20.\",\"VorteX40.\",\"VorteX60.\",\"VorteX80.\",\n  \"XpeedDown200\",\"XpeedDown300\",\"XpeedUp200\",\"XpeedUp300\"\n];\n\nconst VENTANA_SEGUNDOS = 15;\nconst ahoraEnSegundos = Math.floor(data.timestamp_msc / 1000);\n\n// ── OPEN ──────────────────────────────────────────────────────────────────────\nconst cuentasMarcadas = accounts\n  .filter(account => listaLogins.includes(String(account.login)))\n  .flatMap(account => {\n    const positionsFiltradas = (account.positions ?? []).filter(position => {\n      const diff = ahoraEnSegundos - position.time_create;\n      return diff >= 0 && diff <= VENTANA_SEGUNDOS && symbolsAllowed.includes(position.symbol);\n    });\n    return positionsFiltradas.map(position => ({\n      json: {\n        login: String(account.login),\n        name: account.name,\n        estado: \"OPEN\",\n        direccion: position.action,\n        position_id: position.ticket,\n        symbol: position.symbol,\n        volume: position.volume,\n        time_create: position.time_create,\n        price: position.price_open\n      }\n    }));\n  });\n\n// ── CLOSE por removed_logins ──────────────────────────────────────────────────\nconst cuentasEliminadas = removedLogins\n  .filter(login => listaLogins.includes(login))\n  .map(login => ({\n    json: { login, estado: \"CLOSE\" }\n  }));\n\n// ── CLOSE parcial — posición desapareció del WS pero login sigue activo ───────\n// Set de todas las posiciones activas en este mensaje: \"pos:login:position_id\"\nconst posicionesActivasEnWS = new Set(\n  accounts\n    .filter(account => listaLogins.includes(String(account.login)))\n    .flatMap(account =>\n      (account.positions ?? []).map(p =>\n        \"pos:\" + String(account.login) + \":\" + String(p.ticket)\n      )\n    )\n);\n\nconst cierresParciales = redisKeys\n  .filter(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    // El login sigue en el WS (no está en removed_logins)\n    // pero esta posición específica ya no aparece en su array positions\n    const loginSigueEnWS = accounts.some(a => String(a.login) === loginDeKey);\n    const loginEstaEnRemoved = removedLogins.includes(loginDeKey);\n    return loginSigueEnWS && !loginEstaEnRemoved && !posicionesActivasEnWS.has(key);\n  })\n  .map(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    return {\n      json: {\n        login: loginDeKey,\n        estado: \"CLOSE\"\n      }\n    };\n  });\n\nreturn [...cuentasMarcadas, ...cuentasEliminadas, ...cierresParciales];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        1712
+      ],
+      "id": "2c3b0f05-64a4-4cf6-9196-46befda5354d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.estado }}",
+                    "rightValue": "OPEN",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9314909a-6079-4190-87c5-aa2e2ddf685b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "OPEN"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a2cda040-6229-443a-9c3e-7ad0a779bfac",
+                    "leftValue": "={{ $json.estado }}",
+                    "rightValue": "CLOSE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CLOSE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        1712
+      ],
+      "id": "0ad705a3-f02d-4df7-9477-5b6f1c709177",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "pos:*:*"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        736,
+        1712
+      ],
+      "id": "a20539b4-3e71-4be8-8343-271c99a3adc9",
+      "name": "Redis_Snapshot3",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "=propertyName",
+        "key": "={{\"pos:\"+ $json.login + \":\" + $json.position_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        1296
+      ],
+      "id": "f10fec04-88d5-4948-9f35-9610f106de18",
+      "name": "Redis_ReadOpen1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code_DedupOpen — versión final correcta\nconst redisResult = $input.all(); // array de items, uno por posición\n\nreturn redisResult\n  .map((redisItem, index) => {\n    const propertyName = redisItem.json.propertyName ?? null;\n    \n    // Si ya existe en Redis → duplicado, ignorar este item\n    if (propertyName) return null;\n    \n    // Recuperar el item original del Switch3 por índice\n    const originalItem = $('Switch').all()[index]?.json;\n    if (!originalItem) return null;\n    \n    return { json: { ...originalItem } };\n  })\n  .filter(item => item !== null);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        1296
+      ],
+      "id": "d9fd2518-e35d-4874-95ea-459e3e2238fc",
+      "name": "Code_DedupOpen1"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=pos:{{ $json.login }}:{{ $json.position_id }}",
+        "value": "={{ JSON.stringify({ position_id: $json.position_id, unix_stamp: $json.time_create, login: $json.login, symbol: $json.symbol }) }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        1296
+      ],
+      "id": "bd34de4b-c85f-439a-a40a-dce8ca36c463",
+      "name": "Redis12",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-5378499616",
+        "text": "=🔴 *LOGIN MARCADO - APERTURA*\n👤 {{ $json.name }} ({{ $json.login }})\n📈 Symbol: {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.position_id }}\n📈 direction : {{ $json.action }}\n🕐 unix: {{ $json.time_create }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2128,
+        1200
+      ],
+      "id": "71fb11dd-4b35-405b-bf4e-21e2b420888c",
+      "name": "Telegram Apertura2",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_firstItem",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "0a5fa903-90fa-48bb-9222-231f7c9a0875",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        288,
+        1712
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "loginsMarcadosProduccionWhite",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        512,
+        1712
+      ],
+      "id": "b0ed1053-2398-41ed-a429-6007f85bc4a8",
+      "name": "whiteListProduccion",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "pos:7902688:77747089"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        288,
+        2128
+      ],
+      "id": "c90aeea7-0354-4919-a035-a0a3ebc80ade",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "LTw5pTfDGM1M7PnC",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2960,
+        1760
+      ],
+      "id": "4f4b7e4e-a8ee-4d5d-b11f-d28de655c9ac",
+      "name": "Redis_DeleteClose1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=🔴 *LOGIN MARCADO - CIERRE*\nlogin : {{ $json.login }}\nticket : {{ $json.position_id }}\nsymbol : {{ $json.symbol }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2976,
+        2000
+      ],
+      "id": "9fe5a5a1-7088-4da0-879b-11bd7f0d8c4f",
+      "name": "Telegram Apertura1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3184,
+        1760
+      ],
+      "id": "8b6673e2-8bf8-496c-a8da-9463a6ad68c4",
+      "name": "HTTP_AlertClose4",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            },
+            {
+              "name": "volume",
+              "value": "={{ $json.volume }}"
+            },
+            {
+              "name": "direction",
+              "value": "={{ $json.direccion }}"
+            },
+            {
+              "name": "price",
+              "value": "={{ $json.price }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2128,
+        1392
+      ],
+      "id": "5a92721c-ebd8-4424-b2cd-650a8fca8639",
+      "name": "HTTP_AlertOpen"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst seen = new Set();\n\nreturn items.filter(item => {\n  const login = String(item.json.login);\n  if (seen.has(login)) return false;\n  seen.add(login);\n  return true;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1408,
+        1904
+      ],
+      "id": "97d95e43-9a10-4883-b582-d496c04360cf",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Redis_ReadOpen1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_ReadOpen1": {
+      "main": [
+        [
+          {
+            "node": "Code_DedupOpen1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_DedupOpen1": {
+      "main": [
+        [
+          {
+            "node": "Redis12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis12": {
+      "main": [
+        [
+          {
+            "node": "Telegram Apertura2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP_AlertOpen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Redis_Bearer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Bearer": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openedOrders": {
+      "main": [
+        [
+          {
+            "node": "Code_VerifyClose",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_VerifyClose": {
+      "main": [
+        [
+          {
+            "node": "Redis_DeleteClose",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_DeleteClose": {
+      "main": [
+        [
+          {
+            "node": "Redis_DeleteClose1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram Apertura1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "openedOrders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Snapshot3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "whiteListProduccion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "whiteListProduccion": {
+      "main": [
+        [
+          {
+            "node": "Redis_Snapshot3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_DeleteClose1": {
+      "main": [
+        [
+          {
+            "node": "HTTP_AlertClose4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "529e0d40-fce3-4948-a10b-568b3af7c388",
+  "activeVersionId": "529e0d40-fce3-4948-a10b-568b3af7c388",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-29T18:21:07.824Z",
+      "createdAt": "2026-05-29T18:21:07.824Z",
+      "role": "workflow:owner",
+      "workflowId": "c0sV2K39sM9bBvYc",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-23T17:45:50.495Z",
+    "createdAt": "2026-06-23T17:37:33.481Z",
+    "versionId": "529e0d40-fce3-4948-a10b-568b3af7c388",
+    "workflowId": "c0sV2K39sM9bBvYc",
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "// Recibe TODOS los items CLOSE del Switch de una vez\nconst closeItems = $input.all();\nconst rawSnapshot = $('Redis_Snapshot3').first().json;\n\nconst byLogin = {};\n\nfor (const item of closeItems) {\n  const loginCierre = String(item.json.login);\n\n  for (const [key, rawValue] of Object.entries(rawSnapshot)) {\n    if (!key.startsWith('pos:')) continue;\n    const parts = key.split(':');\n    if (parts[1] !== loginCierre) continue;\n\n    const redisData = JSON.parse(rawValue);\n\n    if (!byLogin[loginCierre]) {\n      byLogin[loginCierre] = {\n        login: loginCierre,\n        unix_stamp: redisData.unix_stamp,\n        positions: []\n      };\n    } else if (redisData.unix_stamp < byLogin[loginCierre].unix_stamp) {\n      byLogin[loginCierre].unix_stamp = redisData.unix_stamp;\n    }\n\n    byLogin[loginCierre].positions.push({\n      key,\n      position_id: String(redisData.position_id),\n      symbol: redisData.symbol\n    });\n  }\n}\n\nreturn Object.values(byLogin).map(entry => ({ json: entry }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1632,
+          1904
+        ],
+        "id": "be598eed-b316-4e28-9467-f7c729146040",
+        "name": "Code in JavaScript7",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "bearerToken",
+          "key": "bearerProductionPositions",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1856,
+          1904
+        ],
+        "id": "eecf5de1-9e5d-4933-b6b1-53e8ef0ef246",
+        "name": "Redis_Bearer",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.bearerToken }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2304,
+          1904
+        ],
+        "id": "dd2f9665-73d7-405d-aefa-a13622aba108",
+        "name": "openedOrders"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript8').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const { login, positions } = prev;\n\n  return positions.flatMap(pos => {\n    const order = orders.find(o => String(o.position_id) === String(pos.position_id));\n\n    if (!order) return [];\n    if (order.time_close === 0 || order.time_close === null) return [];\n\n    return [{\n      json: {\n        login,\n        position_id:   String(pos.position_id),\n        symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? pos.symbol,\n        volume:        order.deal_internal_out?.lots ?? order.lots,\n        estado_cierre: \"CONFIRMADO\",\n        key:           pos.key\n      }\n    }];\n  });\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2528,
+          1904
+        ],
+        "id": "6b6d53e5-d705-41db-80bd-66722de0936a",
+        "name": "Code_VerifyClose"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $json.key }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          2752,
+          1904
+        ],
+        "id": "4b2f27ae-1256-4515-a513-11b56b856473",
+        "name": "Redis_DeleteClose",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const allBearer = $input.all();\nconst allPrev = $('Code in JavaScript7').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:      prev.login,\n      unix_stamp: prev.unix_stamp,\n      positions:  prev.positions,  // ← array completo\n      bearerToken\n    }\n  };\n}).filter(Boolean);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2080,
+          1904
+        ],
+        "id": "ba4ff548-4231-4d37-8583-9c3350f6d4a1",
+        "name": "Code in JavaScript8"
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $('Start').first().json.message_firstItem;\nconst accounts = data.accounts;\n\nconst rawMarcados = $('whiteListProduccion').first().json.propertyName;\nconst listaLogins = JSON.parse(rawMarcados).map(l => String(l));\n\nconst removedLogins = (data.removed_logins ?? []).map(l => String(l));\n\n// Snapshot de Redis — todas las keys pos:login:position_id activas\nconst rawSnapshot = $('Redis_Snapshot3').first().json;\nconst redisKeys = Object.keys(rawSnapshot).filter(k => k.startsWith('pos:'));\n\nconst symbolsAllowed = [\n  \"BearX1000.\",\"BearX400.\",\"BearX500.\",\"BearX777.\",\"BearX900.\",\n  \"BullX1000.\",\"BullX400.\",\"BullX500.\",\"BullX777.\",\"BullX900.\",\n  \"EmasVol10\",\"EmasVol100\",\"EmasVol20\",\"EmasVol30\",\"EmasVol40\",\n  \"EmasVol50\",\"EmasVol60\",\"EmasVol70\",\"EmasVol80\",\"EmasVol90\",\n  \"FomoX111.\",\"FomoX333.\",\"FomoX555.\",\"FomoX888.\",\"FomoX999.\",\n  \"FomoXpeed100.\",\"Fortune100.\",\"Fortune1000.\",\"Fortune250.\",\n  \"Fortune500.\",\"FortuneX200.\",\"FortuneX300.\",\"FortuneX500.\",\n  \"LionX100\",\"LionX120\",\"LionX150\",\"LionX200\",\"LionX25\",\n  \"LionX40\",\"LionX50\",\"LionX60\",\"LionX75\",\"LionX90\",\n  \"VorteX100.\",\"VorteX20.\",\"VorteX40.\",\"VorteX60.\",\"VorteX80.\",\n  \"XpeedDown200\",\"XpeedDown300\",\"XpeedUp200\",\"XpeedUp300\"\n];\n\nconst VENTANA_SEGUNDOS = 15;\nconst ahoraEnSegundos = Math.floor(data.timestamp_msc / 1000);\n\n// ── OPEN ──────────────────────────────────────────────────────────────────────\nconst cuentasMarcadas = accounts\n  .filter(account => listaLogins.includes(String(account.login)))\n  .flatMap(account => {\n    const positionsFiltradas = (account.positions ?? []).filter(position => {\n      const diff = ahoraEnSegundos - position.time_create;\n      return diff >= 0 && diff <= VENTANA_SEGUNDOS && symbolsAllowed.includes(position.symbol);\n    });\n    return positionsFiltradas.map(position => ({\n      json: {\n        login: String(account.login),\n        name: account.name,\n        estado: \"OPEN\",\n        direccion: position.action,\n        position_id: position.ticket,\n        symbol: position.symbol,\n        volume: position.volume,\n        time_create: position.time_create,\n        price: position.price_open\n      }\n    }));\n  });\n\n// ── CLOSE por removed_logins ──────────────────────────────────────────────────\nconst cuentasEliminadas = removedLogins\n  .filter(login => listaLogins.includes(login))\n  .map(login => ({\n    json: { login, estado: \"CLOSE\" }\n  }));\n\n// ── CLOSE parcial — posición desapareció del WS pero login sigue activo ───────\n// Set de todas las posiciones activas en este mensaje: \"pos:login:position_id\"\nconst posicionesActivasEnWS = new Set(\n  accounts\n    .filter(account => listaLogins.includes(String(account.login)))\n    .flatMap(account =>\n      (account.positions ?? []).map(p =>\n        \"pos:\" + String(account.login) + \":\" + String(p.ticket)\n      )\n    )\n);\n\nconst cierresParciales = redisKeys\n  .filter(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    // El login sigue en el WS (no está en removed_logins)\n    // pero esta posición específica ya no aparece en su array positions\n    const loginSigueEnWS = accounts.some(a => String(a.login) === loginDeKey);\n    const loginEstaEnRemoved = removedLogins.includes(loginDeKey);\n    return loginSigueEnWS && !loginEstaEnRemoved && !posicionesActivasEnWS.has(key);\n  })\n  .map(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    return {\n      json: {\n        login: loginDeKey,\n        estado: \"CLOSE\"\n      }\n    };\n  });\n\nreturn [...cuentasMarcadas, ...cuentasEliminadas, ...cierresParciales];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          960,
+          1712
+        ],
+        "id": "2c3b0f05-64a4-4cf6-9196-46befda5354d",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.estado }}",
+                      "rightValue": "OPEN",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9314909a-6079-4190-87c5-aa2e2ddf685b"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "OPEN"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "a2cda040-6229-443a-9c3e-7ad0a779bfac",
+                      "leftValue": "={{ $json.estado }}",
+                      "rightValue": "CLOSE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "CLOSE"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          1184,
+          1712
+        ],
+        "id": "0ad705a3-f02d-4df7-9477-5b6f1c709177",
+        "name": "Switch"
+      },
+      {
+        "parameters": {
+          "operation": "keys",
+          "keyPattern": "pos:*:*"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          736,
+          1712
+        ],
+        "id": "a20539b4-3e71-4be8-8343-271c99a3adc9",
+        "name": "Redis_Snapshot3",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "=propertyName",
+          "key": "={{\"pos:\"+ $json.login + \":\" + $json.position_id }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1456,
+          1296
+        ],
+        "id": "f10fec04-88d5-4948-9f35-9610f106de18",
+        "name": "Redis_ReadOpen1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Code_DedupOpen — versión final correcta\nconst redisResult = $input.all(); // array de items, uno por posición\n\nreturn redisResult\n  .map((redisItem, index) => {\n    const propertyName = redisItem.json.propertyName ?? null;\n    \n    // Si ya existe en Redis → duplicado, ignorar este item\n    if (propertyName) return null;\n    \n    // Recuperar el item original del Switch3 por índice\n    const originalItem = $('Switch').all()[index]?.json;\n    if (!originalItem) return null;\n    \n    return { json: { ...originalItem } };\n  })\n  .filter(item => item !== null);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1680,
+          1296
+        ],
+        "id": "d9fd2518-e35d-4874-95ea-459e3e2238fc",
+        "name": "Code_DedupOpen1"
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "=pos:{{ $json.login }}:{{ $json.position_id }}",
+          "value": "={{ JSON.stringify({ position_id: $json.position_id, unix_stamp: $json.time_create, login: $json.login, symbol: $json.symbol }) }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1904,
+          1296
+        ],
+        "id": "bd34de4b-c85f-439a-a40a-dce8ca36c463",
+        "name": "Redis12",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "-5378499616",
+          "text": "=🔴 *LOGIN MARCADO - APERTURA*\n👤 {{ $json.name }} ({{ $json.login }})\n📈 Symbol: {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.position_id }}\n📈 direction : {{ $json.action }}\n🕐 unix: {{ $json.time_create }}\n🕐 {{ $now }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2128,
+          1200
+        ],
+        "id": "71fb11dd-4b35-405b-bf4e-21e2b420888c",
+        "name": "Telegram Apertura2",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 1000,
+        "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "message_firstItem",
+                "type": "any"
+              }
+            ]
+          }
+        },
+        "id": "0a5fa903-90fa-48bb-9222-231f7c9a0875",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          288,
+          1712
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "loginsMarcadosProduccionWhite",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          512,
+          1712
+        ],
+        "id": "b0ed1053-2398-41ed-a429-6007f85bc4a8",
+        "name": "whiteListProduccion",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "pos:7902688:77747089"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          288,
+          2128
+        ],
+        "id": "c90aeea7-0354-4919-a035-a0a3ebc80ade",
+        "name": "Redis",
+        "credentials": {
+          "redis": {
+            "id": "LTw5pTfDGM1M7PnC",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $json.key }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          2960,
+          1760
+        ],
+        "id": "4f4b7e4e-a8ee-4d5d-b11f-d28de655c9ac",
+        "name": "Redis_DeleteClose1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "-1003734325193",
+          "text": "=🔴 *LOGIN MARCADO - CIERRE*\nlogin : {{ $json.login }}\nticket : {{ $json.position_id }}\nsymbol : {{ $json.symbol }}\n🕐 {{ $now }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          2976,
+          2000
+        ],
+        "id": "9fe5a5a1-7088-4da0-879b-11bd7f0d8c4f",
+        "name": "Telegram Apertura1",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 1000,
+        "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "={{ $json.login }}"
+              },
+              {
+                "name": "action",
+                "value": "close"
+              },
+              {
+                "name": "symbol",
+                "value": "={{ $json.symbol }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          3184,
+          1760
+        ],
+        "id": "8b6673e2-8bf8-496c-a8da-9463a6ad68c4",
+        "name": "HTTP_AlertClose4",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "={{ $json.login }}"
+              },
+              {
+                "name": "action",
+                "value": "open"
+              },
+              {
+                "name": "symbol",
+                "value": "={{ $json.symbol }}"
+              },
+              {
+                "name": "volume",
+                "value": "={{ $json.volume }}"
+              },
+              {
+                "name": "direction",
+                "value": "={{ $json.direccion }}"
+              },
+              {
+                "name": "price",
+                "value": "={{ $json.price }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          2128,
+          1392
+        ],
+        "id": "5a92721c-ebd8-4424-b2cd-650a8fca8639",
+        "name": "HTTP_AlertOpen"
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nconst seen = new Set();\n\nreturn items.filter(item => {\n  const login = String(item.json.login);\n  if (seen.has(login)) return false;\n  seen.add(login);\n  return true;\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1408,
+          1904
+        ],
+        "id": "97d95e43-9a10-4883-b582-d496c04360cf",
+        "name": "Code in JavaScript1"
+      }
+    ],
+    "connections": {
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Switch",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch": {
+        "main": [
+          [
+            {
+              "node": "Redis_ReadOpen1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_ReadOpen1": {
+        "main": [
+          [
+            {
+              "node": "Code_DedupOpen1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code_DedupOpen1": {
+        "main": [
+          [
+            {
+              "node": "Redis12",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis12": {
+        "main": [
+          [
+            {
+              "node": "Telegram Apertura2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "HTTP_AlertOpen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript7": {
+        "main": [
+          [
+            {
+              "node": "Redis_Bearer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Bearer": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript8",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "openedOrders": {
+        "main": [
+          [
+            {
+              "node": "Code_VerifyClose",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code_VerifyClose": {
+        "main": [
+          [
+            {
+              "node": "Redis_DeleteClose",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_DeleteClose": {
+        "main": [
+          [
+            {
+              "node": "Redis_DeleteClose1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Telegram Apertura1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript8": {
+        "main": [
+          [
+            {
+              "node": "openedOrders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Snapshot3": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "whiteListProduccion",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "whiteListProduccion": {
+        "main": [
+          [
+            {
+              "node": "Redis_Snapshot3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_DeleteClose1": {
+        "main": [
+          [
+            {
+              "node": "HTTP_AlertClose4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 529e0d40",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
