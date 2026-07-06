@@ -1,0 +1,71 @@
+{
+  "updatedAt": "2026-06-23T09:00:34.700Z",
+  "createdAt": "2026-05-14T22:51:34.589Z",
+  "id": "iPqIWnqM8e1EGo5U",
+  "name": "My workflow 20",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/deals?fmt=json&xat=CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f&Authorization=Bearer%20B7.bVfa-uYWpvVR7nFKfHTdwt.SsxYZKNM8_JBqX"
+      },
+      "type": "n8n-nodes-websocket-ws.websocketTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "bf2778d4-f380-4d25-adef-e3ac74848134",
+      "name": "Websocket Connection & Message"
+    },
+    {
+      "parameters": {
+        "url": "https://ifify.org",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -448,
+        -32
+      ],
+      "id": "86f49dde-3361-4389-8a57-31f2354ed0c4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.sseTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -32
+      ],
+      "id": "46e5b1b3-b842-4003-90f5-30d7a3772f51",
+      "name": "SSE Trigger"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "6855bbcc-9eaf-4267-bd46-12e0ea820c61",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T22:51:34.589Z",
+      "createdAt": "2026-05-14T22:51:34.589Z",
+      "role": "workflow:owner",
+      "workflowId": "iPqIWnqM8e1EGo5U",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
