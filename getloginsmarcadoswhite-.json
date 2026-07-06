@@ -1,0 +1,254 @@
+{
+  "updatedAt": "2026-06-19T21:32:50.906Z",
+  "createdAt": "2026-06-11T17:56:46.372Z",
+  "id": "Mjl4MjDhfh4Wmgu6",
+  "name": "getLoginsMarcadosWhite",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "4071ba9e-03d4-4b3f-a258-3f5ef0aaced2",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://188.245.125.1:8020/api/whitelist",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        144,
+        16
+      ],
+      "id": "1c1fd2ee-7872-4e18-bb0b-edbaa70709de",
+      "name": "getListasMarcadas"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "loginsMarcadosProduccionWhite",
+        "value": "={{ JSON.stringify($json.logins) }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        592,
+        16
+      ],
+      "id": "29425396-8d05-4524-8ea2-2e759826ff2c",
+      "name": "getLoginsMarcadosProd",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const logins = items.flatMap(item => \n\n  item.json.ibs.map(ibs => Number(ibs.account_id))  \n\n);\nconsole.log(logins)\n\nreturn [{ json: { logins } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        16
+      ],
+      "id": "dd39bc82-3791-43ec-88c2-cf5ab96be885",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "getListasMarcadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getListasMarcadas": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "getLoginsMarcadosProd",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "24a4466e-450c-4f8d-a079-4277bf20d1cc",
+  "activeVersionId": "24a4466e-450c-4f8d-a079-4277bf20d1cc",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T17:56:46.372Z",
+      "createdAt": "2026-06-11T17:56:46.372Z",
+      "role": "workflow:owner",
+      "workflowId": "Mjl4MjDhfh4Wmgu6",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-19T21:33:05.582Z",
+    "createdAt": "2026-06-19T21:32:50.382Z",
+    "versionId": "24a4466e-450c-4f8d-a079-4277bf20d1cc",
+    "workflowId": "Mjl4MjDhfh4Wmgu6",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "seconds",
+                "secondsInterval": 20
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -80,
+          16
+        ],
+        "id": "4071ba9e-03d4-4b3f-a258-3f5ef0aaced2",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "url": "http://188.245.125.1:8020/api/whitelist",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          144,
+          16
+        ],
+        "id": "1c1fd2ee-7872-4e18-bb0b-edbaa70709de",
+        "name": "getListasMarcadas"
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "loginsMarcadosProduccionWhite",
+          "value": "={{ JSON.stringify($json.logins) }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          592,
+          16
+        ],
+        "id": "29425396-8d05-4524-8ea2-2e759826ff2c",
+        "name": "getLoginsMarcadosProd",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const logins = items.flatMap(item => \n\n  item.json.ibs.map(ibs => Number(ibs.account_id))  \n\n);\nconsole.log(logins)\n\nreturn [{ json: { logins } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          368,
+          16
+        ],
+        "id": "dd39bc82-3791-43ec-88c2-cf5ab96be885",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "getListasMarcadas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getListasMarcadas": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "getLoginsMarcadosProd",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 24a4466e",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
