@@ -1,0 +1,720 @@
+{
+  "updatedAt": "2026-05-25T15:02:38.853Z",
+  "createdAt": "2026-05-25T06:27:00.123Z",
+  "id": "aoARS3EnMWz1fN3u",
+  "name": "aviso X-aumento",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d32afad5-755a-4d9f-b105-140afb230324",
+              "name": "path",
+              "value": "=/api/v1/risk-monitor/{{ $('Start').item.json.login }}/growth-rate",
+              "type": "string"
+            },
+            {
+              "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+              "name": "body_json",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        448
+      ],
+      "id": "ee732b2f-9dd2-4231-afc7-6ef3eb4bb8fc",
+      "name": "path1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hNkfZRxj5g8aESFu",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+          "cachedResultName": "integridadDatos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        448
+      ],
+      "name": "Call integridadDatos1",
+      "id": "7789bc01-2b08-4907-aff1-8f65f19b7497"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "accessToken",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        448
+      ],
+      "id": "9ec5ff9e-c0aa-4052-ab69-26271adda32b",
+      "name": "getAccessToken1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9809d592-7409-444e-98d3-6cd7f2454937",
+              "name": "aumento-X",
+              "value": "={{ $json.data.delta_percentage / 100  + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "406c69d6-cdea-48fe-ac6b-b0b9500982ff",
+              "name": "data.login",
+              "value": "={{ $json.data.login }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        448
+      ],
+      "id": "a4d2f747-4535-4183-90ed-76b210fe20bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "436265b4-4ebc-4f33-9903-cd8e1f6f8c63",
+              "leftValue": "={{ $json[\"aumento-X\"] }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1104,
+        448
+      ],
+      "id": "48c238d0-2cf3-49ea-8c24-16bcfcc88d44",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=el login {{ $json.data.login }} tiene un aumento de {{ $json[\"aumento-X\"] }}x",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        400
+      ],
+      "id": "e406d1fe-b73b-46c5-b40e-034d2ab43a26",
+      "name": "Send a text message",
+      "webhookId": "993ceda4-9da8-47f7-a15d-ebc7d8dbd31c",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 1000,
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1328,
+        448
+      ],
+      "id": "d248ea36-c1c0-427a-94d7-b47d9e965be3",
+      "name": "Wait",
+      "webhookId": "1d80941b-7aba-4847-83c7-1819cd82d573"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "login",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "id": "2cb2569b-3d06-473b-a05a-f93ecd872644",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -240,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://transactionalapi.branchtech.co/dev/api/v1/risk-monitor/{{ $('Start').item.json.login }}/growth-rate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('getAccessToken1').item.json.propertyName }}"
+            },
+            {
+              "name": "X-Timestamp",
+              "value": "={{ $json[\"X-Timestamp\"] }}"
+            },
+            {
+              "name": "X-Nonce",
+              "value": "={{ $json[\"X-Nonce\"] }}"
+            },
+            {
+              "name": "X-Signature",
+              "value": "={{ $json[\"X-Signature\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        656,
+        448
+      ],
+      "id": "ff420c65-97bf-45b1-9706-28a073198b26",
+      "name": "getGrowRate"
+    }
+  ],
+  "connections": {
+    "path1": {
+      "main": [
+        [
+          {
+            "node": "Call integridadDatos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call integridadDatos1": {
+      "main": [
+        [
+          {
+            "node": "getGrowRate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getAccessToken1": {
+      "main": [
+        [
+          {
+            "node": "path1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "getAccessToken1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getGrowRate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "getGrowRate": [
+      {
+        "json": {
+          "success": true,
+          "http_status": 200,
+          "message": "Growth rate obtenido correctamente",
+          "data": {
+            "login": 100185,
+            "deposit_total": 101000,
+            "withdrawal_total": 5000,
+            "balance": 93059.28,
+            "growth_rate": 97.09,
+            "delta_percentage": 100,
+            "direction": "DECREASE",
+            "currency": "USD",
+            "calculated_at": "2026-05-25T04:17:05.435961-05:00"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "25acde20-e633-4ba8-ae1a-8afe4541a094",
+  "activeVersionId": "25acde20-e633-4ba8-ae1a-8afe4541a094",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-25T06:27:00.123Z",
+      "createdAt": "2026-05-25T06:27:00.123Z",
+      "role": "workflow:owner",
+      "workflowId": "aoARS3EnMWz1fN3u",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-25T13:08:25.223Z",
+    "createdAt": "2026-05-25T13:08:19.492Z",
+    "versionId": "25acde20-e633-4ba8-ae1a-8afe4541a094",
+    "workflowId": "aoARS3EnMWz1fN3u",
+    "nodes": [
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "d32afad5-755a-4d9f-b105-140afb230324",
+                "name": "path",
+                "value": "=/api/v1/risk-monitor/{{ $('Start').item.json.login }}/growth-rate",
+                "type": "string"
+              },
+              {
+                "id": "194535ed-dbe9-4d92-b00b-870bd3984a96",
+                "name": "body_json",
+                "value": "=",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          448
+        ],
+        "id": "ee732b2f-9dd2-4231-afc7-6ef3eb4bb8fc",
+        "name": "path1"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "hNkfZRxj5g8aESFu",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/hNkfZRxj5g8aESFu",
+            "cachedResultName": "integridadDatos"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          432,
+          448
+        ],
+        "name": "Call integridadDatos1",
+        "id": "7789bc01-2b08-4907-aff1-8f65f19b7497"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "accessToken",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -16,
+          448
+        ],
+        "id": "9ec5ff9e-c0aa-4052-ab69-26271adda32b",
+        "name": "getAccessToken1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9809d592-7409-444e-98d3-6cd7f2454937",
+                "name": "aumento-X",
+                "value": "={{ $json.data.delta_percentage / 100  + 1 }}",
+                "type": "number"
+              },
+              {
+                "id": "406c69d6-cdea-48fe-ac6b-b0b9500982ff",
+                "name": "data.login",
+                "value": "={{ $json.data.login }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          880,
+          448
+        ],
+        "id": "a4d2f747-4535-4183-90ed-76b210fe20bc",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "436265b4-4ebc-4f33-9903-cd8e1f6f8c63",
+                "leftValue": "={{ $json[\"aumento-X\"] }}",
+                "rightValue": 2,
+                "operator": {
+                  "type": "number",
+                  "operation": "gte"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1104,
+          448
+        ],
+        "id": "48c238d0-2cf3-49ea-8c24-16bcfcc88d44",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "chatId": "-1003734325193",
+          "text": "=el login {{ $json.data.login }} tiene un aumento de {{ $json[\"aumento-X\"] }}x",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1552,
+          400
+        ],
+        "id": "e406d1fe-b73b-46c5-b40e-034d2ab43a26",
+        "name": "Send a text message",
+        "webhookId": "993ceda4-9da8-47f7-a15d-ebc7d8dbd31c",
+        "executeOnce": false,
+        "retryOnFail": true,
+        "maxTries": 5,
+        "waitBetweenTries": 1000,
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "amount": 1
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          1328,
+          448
+        ],
+        "id": "d248ea36-c1c0-427a-94d7-b47d9e965be3",
+        "name": "Wait",
+        "webhookId": "1d80941b-7aba-4847-83c7-1819cd82d573"
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "login",
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "id": "2cb2569b-3d06-473b-a05a-f93ecd872644",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -240,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://transactionalapi.branchtech.co/dev/api/v1/risk-monitor/{{ $('Start').item.json.login }}/growth-rate",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $('getAccessToken1').item.json.propertyName }}"
+              },
+              {
+                "name": "X-Timestamp",
+                "value": "={{ $json[\"X-Timestamp\"] }}"
+              },
+              {
+                "name": "X-Nonce",
+                "value": "={{ $json[\"X-Nonce\"] }}"
+              },
+              {
+                "name": "X-Signature",
+                "value": "={{ $json[\"X-Signature\"] }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          656,
+          448
+        ],
+        "id": "ff420c65-97bf-45b1-9706-28a073198b26",
+        "name": "getGrowRate"
+      }
+    ],
+    "connections": {
+      "path1": {
+        "main": [
+          [
+            {
+              "node": "Call integridadDatos1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Call integridadDatos1": {
+        "main": [
+          [
+            {
+              "node": "getGrowRate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getAccessToken1": {
+        "main": [
+          [
+            {
+              "node": "path1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Send a text message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "getAccessToken1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getGrowRate": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 25acde20",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
