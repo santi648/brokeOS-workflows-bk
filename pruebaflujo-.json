@@ -1,0 +1,87 @@
+{
+  "updatedAt": "2026-05-30T06:09:52.627Z",
+  "createdAt": "2026-05-26T21:20:51.710Z",
+  "id": "4zgcmq6Weu8wXnnc",
+  "name": "pruebaFlujo",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        16
+      ],
+      "id": "c055b012-20a6-4155-adfe-981b7c4da21d",
+      "name": "Global Constants",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "WYSVkSluRWH2Lf1f",
+          "name": "Global Constants account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c8ca1b10-b89e-4fbc-99fe-07dd2f6ce3af",
+              "name": "constants.Authorization",
+              "value": "={{ $json.constants.Authorization }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        16
+      ],
+      "id": "97f81f30-9ecf-4992-a98e-b5d726c7e10b",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Global Constants": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "432cebf8-7648-498c-96c8-491191ef5a93",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-26T21:20:51.710Z",
+      "createdAt": "2026-05-26T21:20:51.710Z",
+      "role": "workflow:owner",
+      "workflowId": "4zgcmq6Weu8wXnnc",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
