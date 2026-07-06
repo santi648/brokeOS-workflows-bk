@@ -1,0 +1,52 @@
+{
+  "updatedAt": "2026-06-23T08:11:17.576Z",
+  "createdAt": "2026-06-01T07:26:13.219Z",
+  "id": "t6KzWNCgNrErbKqz",
+  "name": "My workflow 25",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        48
+      ],
+      "id": "d8aee7ff-9fa4-4695-99b5-555d886d8ecf",
+      "name": "Global Constants",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "Zsg0hHKy35Wzqh1v",
+          "name": "Global Constants account 2"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "ed42a004-e07b-4a8e-beca-a23e15419e3a",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T07:26:13.219Z",
+      "createdAt": "2026-06-01T07:26:13.219Z",
+      "role": "workflow:owner",
+      "workflowId": "t6KzWNCgNrErbKqz",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
