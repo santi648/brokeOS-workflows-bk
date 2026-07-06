@@ -1,0 +1,121 @@
+{
+  "updatedAt": "2026-06-19T23:16:08.585Z",
+  "createdAt": "2026-06-19T23:11:54.627Z",
+  "id": "LIaoJjVOSIDGn4JF",
+  "name": "My workflow 33",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=7902688"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "=BearX1000."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        -112
+      ],
+      "id": "4b9743d3-cb3f-48cd-bfaf-492048cab9d3",
+      "name": "HTTP_AlertClose4",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dealing.kinero.co/api/webhook/whitelist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "111111"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "=BearX1000."
+            },
+            {
+              "name": "volume",
+              "value": "=1"
+            },
+            {
+              "name": "direction",
+              "value": "buy"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        48,
+        -128
+      ],
+      "id": "327ab194-c9c9-41df-83fb-637d4da975a8",
+      "name": "HTTP_AlertOpen"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "81424446-9046-4dad-a4f3-4c355cf810b5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-19T23:11:54.627Z",
+      "createdAt": "2026-06-19T23:11:54.627Z",
+      "role": "workflow:owner",
+      "workflowId": "LIaoJjVOSIDGn4JF",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
