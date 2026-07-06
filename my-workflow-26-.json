@@ -1,0 +1,254 @@
+{
+  "updatedAt": "2026-06-23T08:11:48.724Z",
+  "createdAt": "2026-06-01T14:59:08.612Z",
+  "id": "FAFcod3X4ecto817",
+  "name": "My workflow 26",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "111111"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "BearX1000."
+            },
+            {
+              "name": "volume",
+              "value": "0.1"
+            },
+            {
+              "name": "direction",
+              "value": "buy"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "c6f74d44-efb0-4e02-b359-42a31fa3952d",
+      "name": "HTTP_AlertOpen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "111111"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "BearX1000."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        64,
+        208
+      ],
+      "id": "36aa1735-90d5-4ef8-a25d-0d04f77f0329",
+      "name": "HTTP_AlertClose"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        448,
+        352
+      ],
+      "id": "220127da-dd7a-42bb-b3b9-f6291ccfa05e",
+      "name": "Redis_DeleteClose1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        336
+      ],
+      "id": "665609cc-9daa-406b-bbbd-653d70b47cae",
+      "name": "HTTP_AlertClose4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        656,
+        352
+      ],
+      "id": "27c99c38-0139-4c35-926f-f1acf769638c",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "Redis_DeleteClose1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP_AlertClose4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_AlertClose4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {
+    "Redis_DeleteClose1": [
+      {
+        "json": {
+          "login": "896326",
+          "position_id": "162169960",
+          "symbol": "BullX900.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:896326:162169960"
+        }
+      },
+      {
+        "json": {
+          "login": "896326",
+          "position_id": "162171428",
+          "symbol": "BearX1000.",
+          "volume": 0.2,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:896326:162171428"
+        }
+      }
+    ]
+  },
+  "versionId": "e9260ec1-0309-4634-85bf-408f87455f2b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T14:59:08.612Z",
+      "createdAt": "2026-06-01T14:59:08.612Z",
+      "role": "workflow:owner",
+      "workflowId": "FAFcod3X4ecto817",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
