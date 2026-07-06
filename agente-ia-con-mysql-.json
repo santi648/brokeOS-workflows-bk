@@ -1,0 +1,277 @@
+{
+  "updatedAt": "2026-06-23T08:59:43.651Z",
+  "createdAt": "2026-05-11T15:03:53.466Z",
+  "id": "pfnxboCst3TokUE1",
+  "name": "Agente IA con MySQL",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "6f5bf642-dee2-4183-9810-06a120112d09",
+      "name": "Recibir Mensaje Telegram",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        216
+      ],
+      "webhookId": "2a692090-5939-40e9-be14-698441330502"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Recibir Mensaje Telegram').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=Eres un asistente amigable para gestion de citas en Google Calendar.\nHoy es {{ $now.setZone(\"America/Bogota\").toISO() }}.\n\nTu mision:\n1. Entender la solicitud del usuario (agendar, consultar o cancelar citas).\n2. Verificar disponibilidad antes de crear eventos usando \"Verificar Disponibilidad\".\n3. Crear, listar o gestionar eventos en Google Calendar.\n4. Responder SIEMPRE al usuario por Telegram en espanol, de forma clara y amigable.\n\nReglas importantes:\n- Si el usuario quiere agendar, PRIMERO verifica disponibilidad.\n- Si el horario esta libre, crea el evento con \"Crear Cita en Calendar\".\n- Si no esta disponible, sugiere alternativas.\n- Para consultar citas usa \"Listar Citas Proximas\".\n- SIEMPRE termina con \"Responder por Telegram\" para confirmar al usuario.\n- El chat ID del usuario es: {{ $(\"Recibir Mensaje Telegram\").item.json.message.chat.id }}\n- Usa formato ISO8601 con zona Colombia (UTC-5) para fechas.\n- Si no especifica duracion, asume 1 hora.\n- Se conciso, amable y usa emojis.",
+          "maxIterations": 8,
+          "enableStreaming": false
+        }
+      },
+      "id": "7f9d892e-12c4-4787-a214-5ca030844cbe",
+      "name": "Agente de Citas",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        232,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-6",
+          "cachedResultName": "Claude Sonnet 4.6"
+        },
+        "options": {
+          "maxTokensToSample": 1024
+        }
+      },
+      "id": "363fd76a-d139-4fa3-94fd-616a56c779b9",
+      "name": "Claude Sonnet",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Recibir Mensaje Telegram').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "id": "c83235c3-7840-4d8a-a7c0-0aee4f2be791",
+      "name": "Memoria Conversacional",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeMin', 'Start datetime ISO8601 of the slot to check, e.g. 2025-06-01T15:00:00-05:00') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeMax', 'End datetime ISO8601 of the slot to check, e.g. 2025-06-01T16:00:00-05:00') }}",
+        "options": {
+          "outputFormat": "availability"
+        }
+      },
+      "id": "9f1f649d-e6e1-4694-83ab-1a46e17cd372",
+      "name": "Verificar Disponibilidad",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('start', 'Start datetime ISO8601, e.g. 2025-06-01T15:00:00-05:00') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('end', 'End datetime ISO8601, e.g. 2025-06-01T16:00:00-05:00') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('description', 'Description or notes for the appointment') }}",
+          "sendUpdates": "none",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('summary', 'Title of the appointment') }}"
+        }
+      },
+      "id": "0e6b95dd-6e08-4109-a847-594ad8c2fe42",
+      "name": "Crear Cita en Calendar",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "primary"
+        },
+        "limit": 10,
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeMin', 'Start date ISO8601 to list events from') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('timeMax', 'End date ISO8601 to list events until') }}",
+        "options": {
+          "orderBy": "startTime"
+        }
+      },
+      "id": "1d9e0d59-c121-453c-8d41-d21e5b567ad5",
+      "name": "Listar Citas Proximas",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('chatId', 'The Telegram chat ID to send the message to') }}",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('text', 'The reply message text in Spanish, using HTML formatting if needed') }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "addd4ef3-d71b-42a3-8bd7-8c9299c72556",
+      "name": "Responder por Telegram",
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        336
+      ],
+      "webhookId": "eee48ce3-c69a-4199-80a1-f5e14a8b7ab2"
+    }
+  ],
+  "connections": {
+    "Recibir Mensaje Telegram": {
+      "main": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Sonnet": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memoria Conversacional": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Disponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Cita en Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Listar Citas Proximas": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder por Telegram": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Citas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "087aaec1-9412-410e-9a04-a45ec0d40d1e",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T15:03:53.466Z",
+      "createdAt": "2026-05-11T15:03:53.466Z",
+      "role": "workflow:owner",
+      "workflowId": "pfnxboCst3TokUE1",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
