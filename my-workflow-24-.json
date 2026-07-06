@@ -1,0 +1,105 @@
+{
+  "updatedAt": "2026-06-01T14:35:27.859Z",
+  "createdAt": "2026-05-30T09:40:26.719Z",
+  "id": "TgvK7lGHSNGKny0N",
+  "name": "My workflow 24",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=111111"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "=BearX1000."
+            },
+            {
+              "name": "volume",
+              "value": "=0.1"
+            },
+            {
+              "name": "direction",
+              "value": "=buy"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -448,
+        496
+      ],
+      "id": "f1b112dc-49bf-4dbb-b187-9ee7e2ef340d",
+      "name": "HTTP_AlertOpen"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=111111"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "=BearX1000."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -416,
+        656
+      ],
+      "id": "0adaaccf-cad6-4909-a10f-ca2e0d9787d0",
+      "name": "HTTP_AlertClose1"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "fea69866-3f0d-42f7-8984-2f56e9e8d8fa",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-30T09:40:26.719Z",
+      "createdAt": "2026-05-30T09:40:26.719Z",
+      "role": "workflow:owner",
+      "workflowId": "TgvK7lGHSNGKny0N",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
