@@ -1,0 +1,375 @@
+{
+  "updatedAt": "2026-06-23T08:11:19.554Z",
+  "createdAt": "2026-06-05T17:13:12.647Z",
+  "id": "4dhPVhRkkD4dcZ6H",
+  "name": "My workflow 30",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "project_relation",
+          "mode": "list",
+          "cachedResultName": "project_relation"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "userId",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b80bce5-e16e-42d9-98e0-ecb1e5e1f4d4",
+      "name": "selectRelationUserProject",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "user",
+          "mode": "list",
+          "cachedResultName": "user"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "email",
+              "value": "lspardo@uniboyaca.edu.co"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -240,
+        32
+      ],
+      "id": "a91912eb-7992-46ca-9825-e7618586b85c",
+      "name": "selectUsers",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "shared_credentials",
+          "mode": "list",
+          "cachedResultName": "shared_credentials"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "projectId": "={{ $json.projectId }}",
+            "role": "credential:owner",
+            "credentialsId": "={{ $json.credentialsId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "credentialsId",
+              "displayName": "credentialsId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "projectId",
+              "displayName": "projectId",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "role",
+              "displayName": "role",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "updatedAt",
+              "displayName": "updatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        400,
+        96
+      ],
+      "id": "708cd426-2135-4970-82aa-aa53288fe6d8",
+      "name": "insertSharedCredentials",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "credentials_entity",
+          "mode": "list",
+          "cachedResultName": "credentials_entity"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "name",
+              "value": "marketing gmail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "a39868e9-871d-4d97-a66f-e195d521a8c7",
+      "name": "selectCredentials",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32bdd2e1-3ab1-4f26-aaa0-e487ac381e9d",
+              "name": "projectId",
+              "value": "={{ $node[\"selectRelationUserProject\"].json[\"projectId\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "f4d01a6b-ffcf-49b2-982a-e9bbceceee17",
+              "name": "credentialsId",
+              "value": "={{ $node[\"selectCredentials\"].json[\"id\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        96
+      ],
+      "id": "3b2ba92f-c22e-440b-9a81-bcc31b24037f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "credentials_entity",
+          "mode": "list",
+          "cachedResultName": "credentials_entity"
+        },
+        "where": {
+          "values": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -416,
+        304
+      ],
+      "id": "af90aade-b71f-4a23-b9b9-92164519cfb7",
+      "name": "selectUsers1",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-globals.globalConstants",
+      "typeVersion": 1,
+      "position": [
+        32,
+        944
+      ],
+      "id": "91753b3d-dbad-4cdc-a1f1-6d42522264b5",
+      "name": "Global Constants",
+      "credentials": {
+        "globalConstantsApi": {
+          "id": "Zsg0hHKy35Wzqh1v",
+          "name": "Global Constants account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "selectRelationUserProject": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "selectUsers": {
+      "main": [
+        [
+          {
+            "node": "selectRelationUserProject",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "selectCredentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "selectCredentials": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "insertSharedCredentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "7a59cfd0-a292-4dba-84c4-a709c1a89d4c",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-05T17:13:12.647Z",
+      "createdAt": "2026-06-05T17:13:12.647Z",
+      "role": "workflow:owner",
+      "workflowId": "4dhPVhRkkD4dcZ6H",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
