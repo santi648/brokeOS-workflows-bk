@@ -1,0 +1,79 @@
+{
+  "updatedAt": "2026-06-23T08:11:55.506Z",
+  "createdAt": "2026-05-15T12:30:53.675Z",
+  "id": "RKOy4j0UF7SB79S6",
+  "name": "wsUserLogin",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "websocketUrl": "wss://apicrm.kynex.trade:11873/ws/users?fmt=json",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "xat",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshEnabled": true,
+        "tokenRefreshUrl": "https://apicrm.kynex.trade:11873/pool/token/connect",
+        "tokenRefreshHeaders": {
+          "headers": [
+            {
+              "name": "X-Admin-Token",
+              "value": "CsKuFGw~r1*IaBMo0saEDsGD*yBM!CB*Tkbchbuf4mlRxZ3eXCZGLmtf5lkvCQ2f"
+            }
+          ]
+        },
+        "tokenRefreshFormFields": {
+          "fields": [
+            {
+              "name": "tipo",
+              "value": "Websockets"
+            },
+            {
+              "name": "ttl_hours",
+              "value": "12"
+            }
+          ]
+        },
+        "tokenRefreshResponsePath": "new_token",
+        "reconnectInterval": 1,
+        "maxReconnectAttempts": 5
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        64
+      ],
+      "id": "e5ef52b4-bd71-4719-8542-dd2671c43906",
+      "name": "WebSocket Reconnect1"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "ce5dfaf0-4981-477b-ad1a-54f5ed5c4cf2",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-15T12:30:53.675Z",
+      "createdAt": "2026-05-15T12:30:53.675Z",
+      "role": "workflow:owner",
+      "workflowId": "RKOy4j0UF7SB79S6",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
