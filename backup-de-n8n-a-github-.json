@@ -1,0 +1,558 @@
+{
+  "updatedAt": "2026-07-06T14:28:31.389Z",
+  "createdAt": "2026-05-12T01:10:06.727Z",
+  "id": "QxvhvlfzPnal2B9m",
+  "name": "BackUp de N8N a GitHub",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "id": "654a1ab2-189c-463c-a9ee-7243d570ac14",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -208,
+        16
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "### PASO 1: Obten los archivos desde Github",
+        "height": 236,
+        "width": 380,
+        "color": 5
+      },
+      "id": "494f7027-f4a9-4c17-9ded-bdedd95df89a",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### PASO 2: Obten lo flujos de tu n8n",
+        "height": 236,
+        "width": 684,
+        "color": 3
+      },
+      "id": "61c06f8b-943b-4837-bd49-2e2f4849befd",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### PASO 3: Lleva los flujos, nuevos o no, a GitHub",
+        "height": 284,
+        "width": 1180,
+        "color": 4
+      },
+      "id": "eba488bf-b6de-46b9-9a1b-28468ee09cef",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1104,
+        16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        192
+      ],
+      "id": "95998982-370c-40ad-9190-a30eebf17827",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "list",
+        "owner": {
+          "__rl": true,
+          "value": "https://github.com/santi648",
+          "mode": "url"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "brokeOS-workflows-bk",
+          "mode": "list",
+          "cachedResultName": "brokeOS-workflows-bk",
+          "cachedResultUrl": "https://github.com/santi648/brokeOS-workflows-bk"
+        },
+        "filePath": "="
+      },
+      "id": "249d3759-323a-47ec-8a71-a70de0a2e3af",
+      "name": "Enlista los archivos del repositorio",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        64,
+        64
+      ],
+      "webhookId": "354d699e-44b0-4444-9d31-af7fd4ff5561",
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "githubApi": {
+          "id": "d110zvrgfMuzrbua",
+          "name": "GitHub account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "26efdd5d-cb77-4e01-9b62-bbaebe6b0cc0",
+      "name": "Junta",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        256,
+        64
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "filters": {
+          "projectId": "YlWHwxOGxcFi2H90"
+        },
+        "requestOptions": {}
+      },
+      "id": "0118f919-5133-4cb8-81fa-d9fac2043b7c",
+      "name": "Obten los flujos de tu n8n",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        480,
+        64
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "VfIKJBsNihAATKHc",
+          "name": "n8n account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true
+        }
+      },
+      "id": "e14f820f-887e-4462-a5f4-f747127ff94d",
+      "name": "Convierte a .JSON",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        704,
+        64
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "id": "8610337a-eed7-4c58-9f72-97a15c273bef",
+      "name": "A base64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        928,
+        64
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fe4a36ef-9f04-40e3-99bd-cc517a49b440",
+              "name": "commitDate",
+              "type": "string",
+              "value": "={{ $now.format('dd-MM-yyyy/H:mm') }}"
+            },
+            {
+              "id": "b0fe1bcc-e79c-4a6b-b8b4-44222c8bf4e8",
+              "name": "fileName",
+              "type": "string",
+              "value": "={{ $('Obten los flujos de tu n8n').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Obten los flujos de tu n8n').item.json.tags[0].name }}.json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "53e47720-5e08-42fa-8aef-0263e97d04ea",
+      "name": "Commit Fecha + Nombre de archivo",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1152,
+        64
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "03a6bafd-d6dd-41de-80f9-eba85bda7441",
+      "name": "Separa de 1 en 1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $('Junta').item.json.name }}",
+              "operation": "contains",
+              "value2": "={{ $('Obten los flujos de tu n8n').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Obten los flujos de tu n8n').item.json.tags[0].name }}.json"
+            }
+          ]
+        }
+      },
+      "id": "487d3a80-64e9-4f26-a18b-d91cbd6df926",
+      "name": "¿El archivo ya está respaldado?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1616,
+        48
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "santi648",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "brokeOS-workflows",
+          "mode": "list",
+          "cachedResultName": "brokeOS-workflows",
+          "cachedResultUrl": "https://github.com/santi648/brokeOS-workflows"
+        },
+        "filePath": "={{ $('Obten los flujos de tu n8n').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Obten los flujos de tu n8n').item.json.tags[0].name }}.json",
+        "fileContent": "={{ $('A base64').item.json.data }}",
+        "commitMessage": "=backup-{{ $('Commit Fecha + Nombre de archivo').item.json.commitDate }}"
+      },
+      "id": "b4f0383d-9c6f-4be9-8f70-91f5a652c1cb",
+      "name": "Actualizar archivo",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        2032,
+        80
+      ],
+      "webhookId": "27218087-8df7-474d-a39f-70cfa9c34ec8",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "d110zvrgfMuzrbua",
+          "name": "GitHub account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "owner": {
+          "__rl": true,
+          "value": "santi648",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "brokeOS-workflows-bk",
+          "mode": "list",
+          "cachedResultName": "brokeOS-workflows-bk",
+          "cachedResultUrl": "https://github.com/santi648/brokeOS-workflows-bk"
+        },
+        "filePath": "={{ $('Obten los flujos de tu n8n').item.json.name.replace(/\\s+/g, '-').toLowerCase() }}-{{ $('Obten los flujos de tu n8n').item.json.tags[0].name }}.json",
+        "fileContent": "={{ $('A base64').item.json.data }}",
+        "commitMessage": "=backup-{{ $node['Commit Fecha + Nombre de archivo'].json.commitDate }}"
+      },
+      "id": "f2555791-20e3-4373-b517-b61154b050ae",
+      "name": "Subir Archivo",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1808,
+        112
+      ],
+      "webhookId": "ce4b561b-acb9-4cd8-b76f-4928dada9674",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "d110zvrgfMuzrbua",
+          "name": "GitHub account 2"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "returnAll": false,
+        "limit": 3,
+        "filters": {
+          "activeWorkflows": true,
+          "projectId": "YlWHwxOGxcFi2H90"
+        },
+        "requestOptions": {}
+      },
+      "id": "dc8cd183-f8da-4fbd-84b3-edcf88065e27",
+      "name": "Obten los flujos de tu n8n1",
+      "type": "n8n-nodes-base.n8n",
+      "position": [
+        528,
+        544
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "n8nApi": {
+          "id": "oUlqcDcognISAuQZ",
+          "name": "n8n account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Enlista los archivos del repositorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Enlista los archivos del repositorio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enlista los archivos del repositorio": {
+      "main": [
+        [
+          {
+            "node": "Junta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Junta": {
+      "main": [
+        [
+          {
+            "node": "Obten los flujos de tu n8n",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obten los flujos de tu n8n": {
+      "main": [
+        [
+          {
+            "node": "Convierte a .JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convierte a .JSON": {
+      "main": [
+        [
+          {
+            "node": "A base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A base64": {
+      "main": [
+        [
+          {
+            "node": "Commit Fecha + Nombre de archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commit Fecha + Nombre de archivo": {
+      "main": [
+        [
+          {
+            "node": "Separa de 1 en 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separa de 1 en 1": {
+      "main": [
+        [
+          {
+            "node": "¿El archivo ya está respaldado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿El archivo ya está respaldado?": {
+      "main": [
+        [
+          {
+            "node": "Actualizar archivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Subir Archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar archivo": {
+      "main": [
+        [
+          {
+            "node": "Separa de 1 en 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Separa de 1 en 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir Archivo": {
+      "main": [
+        [
+          {
+            "node": "Separa de 1 en 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Separa de 1 en 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {}
+      }
+    ],
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-01-11T00:00:13.009-05:00",
+          "Readable date": "January 11th 2026, 12:00:13 am",
+          "Readable time": "12:00:13 am",
+          "Day of week": "Sunday",
+          "Year": "2026",
+          "Month": "January",
+          "Day of month": "11",
+          "Hour": "00",
+          "Minute": "00",
+          "Second": "13",
+          "Timezone": "America/New_York (UTC-05:00)"
+        }
+      }
+    ]
+  },
+  "versionId": "6deb7424-631f-47c3-aa8b-4398050a63aa",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T01:10:06.727Z",
+      "createdAt": "2026-05-12T01:10:06.727Z",
+      "role": "workflow:owner",
+      "workflowId": "QxvhvlfzPnal2B9m",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
