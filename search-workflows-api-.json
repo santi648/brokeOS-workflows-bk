@@ -1,0 +1,99 @@
+{
+  "updatedAt": "2026-05-11T07:56:36.618Z",
+  "createdAt": "2026-05-11T07:34:43.791Z",
+  "id": "REGwDxOca4a3Gjdg",
+  "name": "Search Workflows API",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "node-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "search_workflows",
+        "responseMode": "responseNode"
+      },
+      "webhookId": "25c07ab8-f3ea-497f-873b-4b17cc623ca9"
+    },
+    {
+      "id": "node-2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        420,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "https://your-n8n-instance/api/workflows?search={{$json.search}}",
+        "sendBody": false,
+        "authentication": "none"
+      }
+    },
+    {
+      "id": "node-3",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        640,
+        300
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{JSON.stringify($json)}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "cbedd9df-be0a-4c9d-80d0-7952a7b582ff",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T07:34:43.791Z",
+      "createdAt": "2026-05-11T07:34:43.791Z",
+      "role": "workflow:owner",
+      "workflowId": "REGwDxOca4a3Gjdg",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
