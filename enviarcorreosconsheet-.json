@@ -1,0 +1,877 @@
+{
+  "updatedAt": "2026-05-08T16:09:45.616Z",
+  "createdAt": "2026-05-08T14:31:39.074Z",
+  "id": "nWNGPnYbQg07DgcD",
+  "name": "enviarCorreosConSheet",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "hoja de prueba",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "inactivos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -272,
+        960
+      ],
+      "id": "e549c48d-14d4-42e5-bb45-1db3411367cb",
+      "name": "Create spreadsheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '2026-04-23 00:00:00'\nORDER BY LastAccess ASC\nlimit 100;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -80,
+        960
+      ],
+      "id": "23d8b16a-83c1-46f9-aa07-29b9712c4f25",
+      "name": "getInactive",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Create spreadsheet').item.json.sheets[0].properties.title }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Login",
+              "displayName": "Login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LastAccess",
+              "displayName": "LastAccess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        128,
+        960
+      ],
+      "id": "e4682e35-53d7-42bd-92ee-6f562c4c142b",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "sheetId"
+            },
+            {
+              "name": "fechaConsulta",
+              "type": "any"
+            },
+            {
+              "name": "correoMensaje"
+            },
+            {
+              "name": "email"
+            }
+          ]
+        }
+      },
+      "id": "51482846-eeea-4f65-b50c-a367da76897a",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -672,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cbd06218-e14a-4560-a12b-b90dba37a32d",
+              "leftValue": "={{ $json.sheetId }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "2991be1b-cb34-4631-abc4-de0c56488f98",
+              "leftValue": "={{ $json.sheetId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        1072
+      ],
+      "id": "d7d1bc2c-9215-4f7f-9d02-f03c1d734069",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '2026-04-23 00:00:00'\nORDER BY LastAccess ASC\nlimit 50;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        -224,
+        1152
+      ],
+      "id": "bd5b3cc2-7335-4b70-a763-4e75b5447587",
+      "name": "getInactive1",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Start').item.json.sheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "=inactivos",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Login"
+          ],
+          "schema": [
+            {
+              "id": "Login",
+              "displayName": "Login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LastAccess",
+              "displayName": "LastAccess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        1152
+      ],
+      "id": "3cbe1121-02c3-411c-ae80-11ecf37fa059",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Start').item.json.email }}",
+        "subject": "registro usuarios inactivos",
+        "message": "={{ $('Start').item.json.correoMensaje }}\nhttps://docs.google.com/spreadsheets/d/{{ $('Create spreadsheet').item.json.spreadsheetId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        960
+      ],
+      "id": "424bf0fc-1c04-425a-b12d-98ec282edd26",
+      "name": "Send a message",
+      "webhookId": "622a3e62-b1dd-40ed-b42b-6c5a70421ee6",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rYlfmBHKbx5tciTg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Start').item.json.email }}",
+        "subject": "=registro usuarios inactivos",
+        "message": "={{ $('Start').item.json.correoMensaje }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        1152
+      ],
+      "id": "ffd1cd2d-cdd2-4d4e-bb84-19152acd3258",
+      "name": "Send a message1",
+      "webhookId": "622a3e62-b1dd-40ed-b42b-6c5a70421ee6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rYlfmBHKbx5tciTg",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Create spreadsheet": {
+      "main": [
+        [
+          {
+            "node": "getInactive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getInactive": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "getInactive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getInactive1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "2dc47fb0-39cc-4dcd-860f-6ed260832950",
+  "activeVersionId": "2dc47fb0-39cc-4dcd-860f-6ed260832950",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T14:31:39.074Z",
+      "createdAt": "2026-05-08T14:31:39.074Z",
+      "role": "workflow:owner",
+      "workflowId": "nWNGPnYbQg07DgcD",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-08T16:09:48.098Z",
+    "createdAt": "2026-05-08T16:09:45.617Z",
+    "versionId": "2dc47fb0-39cc-4dcd-860f-6ed260832950",
+    "workflowId": "nWNGPnYbQg07DgcD",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "spreadsheet",
+          "title": "hoja de prueba",
+          "sheetsUi": {
+            "sheetValues": [
+              {
+                "title": "inactivos"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -272,
+          960
+        ],
+        "id": "e549c48d-14d4-42e5-bb45-1db3411367cb",
+        "name": "Create spreadsheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "BwM5digEGzX6yKRy",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '2026-04-23 00:00:00'\nORDER BY LastAccess ASC\nlimit 100;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.5,
+        "position": [
+          -80,
+          960
+        ],
+        "id": "23d8b16a-83c1-46f9-aa07-29b9712c4f25",
+        "name": "getInactive",
+        "credentials": {
+          "mySql": {
+            "id": "NopIcsahOQe5ykJm",
+            "name": "MySQL account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $('Create spreadsheet').item.json.spreadsheetId }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "={{ $('Create spreadsheet').item.json.sheets[0].properties.title }}",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Login",
+                "displayName": "Login",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "FullName",
+                "displayName": "FullName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "LastAccess",
+                "displayName": "LastAccess",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          128,
+          960
+        ],
+        "id": "e4682e35-53d7-42bd-92ee-6f562c4c142b",
+        "name": "Append or update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "BwM5digEGzX6yKRy",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "sheetId"
+              },
+              {
+                "name": "fechaConsulta",
+                "type": "any"
+              },
+              {
+                "name": "correoMensaje"
+              },
+              {
+                "name": "email"
+              }
+            ]
+          }
+        },
+        "id": "51482846-eeea-4f65-b50c-a367da76897a",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -672,
+          1072
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "cbd06218-e14a-4560-a12b-b90dba37a32d",
+                "leftValue": "={{ $json.sheetId }}",
+                "rightValue": "null",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              },
+              {
+                "id": "2991be1b-cb34-4631-abc4-de0c56488f98",
+                "leftValue": "={{ $json.sheetId }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "empty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -464,
+          1072
+        ],
+        "id": "d7d1bc2c-9215-4f7f-9d02-f03c1d734069",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '2026-04-23 00:00:00'\nORDER BY LastAccess ASC\nlimit 50;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.5,
+        "position": [
+          -224,
+          1152
+        ],
+        "id": "bd5b3cc2-7335-4b70-a763-4e75b5447587",
+        "name": "getInactive1",
+        "credentials": {
+          "mySql": {
+            "id": "NopIcsahOQe5ykJm",
+            "name": "MySQL account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "value": "={{ $('Start').item.json.sheetId }}",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "=inactivos",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "Login"
+            ],
+            "schema": [
+              {
+                "id": "Login",
+                "displayName": "Login",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "FullName",
+                "displayName": "FullName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "LastAccess",
+                "displayName": "LastAccess",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -32,
+          1152
+        ],
+        "id": "3cbe1121-02c3-411c-ae80-11ecf37fa059",
+        "name": "Append or update row in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "BwM5digEGzX6yKRy",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('Start').item.json.email }}",
+          "subject": "registro usuarios inactivos",
+          "message": "={{ $('Start').item.json.correoMensaje }}\nhttps://docs.google.com/spreadsheets/d/{{ $('Create spreadsheet').item.json.spreadsheetId }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          336,
+          960
+        ],
+        "id": "424bf0fc-1c04-425a-b12d-98ec282edd26",
+        "name": "Send a message",
+        "webhookId": "622a3e62-b1dd-40ed-b42b-6c5a70421ee6",
+        "executeOnce": true,
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "rYlfmBHKbx5tciTg",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('Start').item.json.email }}",
+          "subject": "=registro usuarios inactivos",
+          "message": "={{ $('Start').item.json.correoMensaje }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          128,
+          1152
+        ],
+        "id": "ffd1cd2d-cdd2-4d4e-bb84-19152acd3258",
+        "name": "Send a message1",
+        "webhookId": "622a3e62-b1dd-40ed-b42b-6c5a70421ee6",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "rYlfmBHKbx5tciTg",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Create spreadsheet": {
+        "main": [
+          [
+            {
+              "node": "getInactive",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getInactive": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Create spreadsheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "getInactive1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getInactive1": {
+        "main": [
+          [
+            {
+              "node": "Append or update row in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append or update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append or update row in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Send a message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 2dc47fb0",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
