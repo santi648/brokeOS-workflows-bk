@@ -1,0 +1,78 @@
+{
+  "updatedAt": "2026-05-25T14:53:17.005Z",
+  "createdAt": "2026-05-14T06:21:09.808Z",
+  "id": "GoauA7cV8pGwAULq",
+  "name": "🔍 Debug - Check PG Extensions",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "id": "0b971f40-e418-42a6-a26f-241434059a1f",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dfabba92-b4e8-4d20-82c0-9a0e3bfda63a",
+      "name": "Verificar extensiones y formato ID",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        224,
+        0
+      ],
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "\n        SELECT name, default_version, installed_version \n        FROM pg_available_extensions \n        WHERE name IN ('uuid-ossp', 'pgcrypto');\n      "
+      },
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Verificar extensiones y formato ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "5f576de3-1a83-405b-a888-14d93e5d3234",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-14T06:21:09.808Z",
+      "createdAt": "2026-05-14T06:21:09.808Z",
+      "role": "workflow:owner",
+      "workflowId": "GoauA7cV8pGwAULq",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
