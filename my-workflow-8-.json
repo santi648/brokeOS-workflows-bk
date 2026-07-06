@@ -1,0 +1,203 @@
+{
+  "updatedAt": "2026-05-25T14:54:40.965Z",
+  "createdAt": "2026-04-17T01:47:33.360Z",
+  "id": "i3QQSHjazx2kPXEY",
+  "name": "My workflow 8",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://app-n8n.branchtech.co/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "=abc123"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ed4d0e53-ca1b-40c2-af90-b39fa54fbb9f",
+      "name": "Setup Cookie"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fcbe8a3-ac9e-4d84-907b-352efd2d558e",
+              "name": "sessionIdByRegex",
+              "value": "={{ $('Setup Cookie').first().json.headers['set-cookie'][0].match(/(^| )sessionId=([^;]+)/)[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        0
+      ],
+      "id": "2cefecb7-2637-4d4b-85c8-94246ce89686",
+      "name": "Parse Cookie Header Value"
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/get",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "maybeASearchPage",
+              "value": "items of value"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{ $('Parse Cookie Header Value').first().json.sessionIdByRegex }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "6fda2115-a3cd-48cb-a731-7159e6d76a06",
+      "name": "Next Request that Requires Session Cookie"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        752,
+        0
+      ],
+      "id": "66f707d3-153e-4656-82fd-672a30885309",
+      "name": "etc."
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/cookies",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cookie",
+              "value": "={{ $('Parse Cookie Header Value').first().json.sessionIdByRegex }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        368,
+        0
+      ],
+      "id": "9d3be45f-4297-4289-8b85-94343e47d148",
+      "name": "Another Request that Requires Session Cookie"
+    }
+  ],
+  "connections": {
+    "Setup Cookie": {
+      "main": [
+        [
+          {
+            "node": "Parse Cookie Header Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Cookie Header Value": {
+      "main": [
+        [
+          {
+            "node": "Another Request that Requires Session Cookie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Next Request that Requires Session Cookie": {
+      "main": [
+        [
+          {
+            "node": "etc.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Another Request that Requires Session Cookie": {
+      "main": [
+        [
+          {
+            "node": "Next Request that Requires Session Cookie",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "3f6fa8cc-403b-4206-8b3a-9bf49ce6f52d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-17T01:47:33.360Z",
+      "createdAt": "2026-04-17T01:47:33.360Z",
+      "role": "workflow:owner",
+      "workflowId": "i3QQSHjazx2kPXEY",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
