@@ -1,0 +1,186 @@
+{
+  "updatedAt": "2026-05-11T07:56:00.534Z",
+  "createdAt": "2026-05-11T07:45:57.092Z",
+  "id": "AlyxbcfLCGEHyCJy",
+  "name": "Agente IA – Gestión de Google Calendar",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "calendar-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-1",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        112,
+        304
+      ],
+      "webhookId": "64d6baa3-2796-43e2-8677-f0777ce7a4f0"
+    },
+    {
+      "parameters": {
+        "agent": "toolsAgent",
+        "options": {
+          "systemMessage": "Eres un asistente útil que gestiona horarios en Google Calendar. Usa las herramientas provistas para crear, leer o actualizar eventos según la solicitud del usuario. Cada conversación tiene su propio sessionId: {{$json.sessionId}}."
+        }
+      },
+      "id": "node-2",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        392,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "node-3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        336,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "sessionKey": "={{$json.sessionId}}",
+        "contextWindowLength": 10
+      },
+      "id": "node-4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1,
+      "position": [
+        464,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "name": "calendarTool",
+        "description": "Crear o leer eventos en Google Calendar",
+        "workflowId": {
+          "__rl": true,
+          "value": "CALENDAR_TOOL_SUBWF_ID",
+          "mode": "id"
+        }
+      },
+      "id": "node-5",
+      "name": "Calendar Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1,
+      "position": [
+        592,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json.output}}",
+        "options": {}
+      },
+      "id": "node-6",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        800,
+        304
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "f27a08f7-3e91-4494-9ab9-b903a7138867",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T07:45:57.092Z",
+      "createdAt": "2026-05-11T07:45:57.092Z",
+      "role": "workflow:owner",
+      "workflowId": "AlyxbcfLCGEHyCJy",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
