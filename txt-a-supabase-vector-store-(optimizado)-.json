@@ -1,0 +1,296 @@
+{
+  "updatedAt": "2026-06-23T09:00:09.279Z",
+  "createdAt": "2026-05-11T07:59:17.395Z",
+  "id": "ydw6BfTwhC8s5cOz",
+  "name": "TXT a Supabase Vector Store (optimizado)",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un generador de workflows de n8n. Tu ÚNICA fuente de verdad es la base de datos vectorial con la documentación oficial de n8n.\n\n## REGLAS\n- **SIEMPRE** busca en la vector store ANTES de responder.\n- **NUNCA** inventes nodos, parámetros o configuraciones que no estén en la documentación.\n- Si no encuentras la información, responde: \"No encontré documentación suficiente para este caso.\"\n- **NUNCA** uses conocimiento previo para rellenar lo que no encontraste en la búsqueda.\n\n## FLUJO OBLIGATORIO\n\n**1. Buscar** → Consulta la vector store: nodos, parámetros y conexiones requeridas.\n**2. Validar** → ¿Existen los nodos? ¿Los parámetros están documentados? Si no, informa al usuario.\n**3. Generar** → Solo si validaste, produce el JSON con esta estructura:\n\n{\n  \"name\": \"Nombre del workflow\",\n  \"nodes\": [\n    {\n      \"parameters\": {},\n      \"id\": \"uuid-unico\",\n      \"name\": \"Nombre del nodo\",\n      \"type\": \"n8n-nodes-base.TIPO_EXACTO\",\n      \"typeVersion\": 1,\n      \"position\": [x, y]\n    }\n  ],\n  \"connections\": {\n    \"Nodo Origen\": {\n      \"main\": [[{ \"node\": \"Nodo Destino\", \"type\": \"main\", \"index\": 0 }]]\n    }\n  },\n  \"settings\": { \"executionOrder\": \"v1\" }\n}\n\n**4. Explicar** → Qué hace cada nodo, qué debe configurar el usuario manualmente y qué documentación encontraste.\n\n## RESPUESTA\n\n**📚 Documentación encontrada:** [nodos/conceptos hallados en la vector store]\n**⚠️ Advertencias:** [lo que falta o el usuario debe verificar]\n**🔧 Workflow JSON:** ```json { ... } ```\n**📝 Configuración manual:** [credenciales, IDs u otros pasos necesarios]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -896,
+        -128
+      ],
+      "id": "d4677d6f-38d1-4589-813a-457053e545c8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "documentacion completa de n8n",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 12,
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -480,
+        112
+      ],
+      "id": "59e89698-dd95-4587-b76e-3e1e9e1984ca",
+      "name": "documentacionN8n",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LxO592VYSvIpM9fz",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -816,
+        112
+      ],
+      "id": "95dd5e85-b172-404e-97ee-c826a180cadf",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "qwen3-coder-next",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        64
+      ],
+      "id": "d975c259-3aca-4a49-b5f3-cc1f7a5ee253",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -1216,
+        -112
+      ],
+      "id": "2a90adce-5ffa-4063-b303-a2a5253bde59",
+      "name": "When chat message received",
+      "webhookId": "08835349-3011-42a0-92e5-c1172d07adf9"
+    },
+    {
+      "parameters": {
+        "formTitle": "N8n docs",
+        "formDescription": "hola",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "put a file",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "bf7f18b7-106e-4c5c-95a3-8bb501ca16b5",
+      "name": "On form submission",
+      "webhookId": "220c3f4d-b786-46f5-ac50-423d9f634b16"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        224
+      ],
+      "id": "0dd93434-5c11-4778-907a-97c926319153",
+      "name": "Default Data Loader",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "d05c6b23-b1de-4143-9b39-6dcd5fa2dc79",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LxO592VYSvIpM9fz",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "ibm-granite/granite-embedding-278m-multilingual",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsHuggingFaceInference",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        304
+      ],
+      "id": "0237516c-e2c7-45d0-92b5-286e1b635b81",
+      "name": "Embeddings HuggingFace Inference",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "huggingFaceApi": {
+          "id": "Mr7g7T4NM1BOECsi",
+          "name": "Hugging Face account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "documentacionN8n": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings HuggingFace Inference": {
+      "ai_embedding": [
+        [
+          {
+            "node": "documentacionN8n",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "f56d6847-75ed-48d1-91cb-eb53b009b6b7",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T07:59:17.395Z",
+      "createdAt": "2026-05-11T07:59:17.395Z",
+      "role": "workflow:owner",
+      "workflowId": "ydw6BfTwhC8s5cOz",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
