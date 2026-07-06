@@ -1,0 +1,139 @@
+{
+  "updatedAt": "2026-05-25T14:54:45.575Z",
+  "createdAt": "2026-04-22T15:25:21.309Z",
+  "id": "MAwQzsvYfYvk9uuG",
+  "name": "My workflow 9",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e1cac086-25c7-4cca-bb7a-91e49c2f8a38",
+      "name": "When chat message received",
+      "webhookId": "116b80c0-81e5-4430-936c-dd805c327b0a"
+    },
+    {
+      "parameters": {
+        "url": "https://rickandmortyapi.com/api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9ff8baa6-531c-4a92-9a7f-7bdc814a6891",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n {\n   json: {\n      value:$input.first().json.characters \n   }\n }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        128
+      ],
+      "id": "b6604334-4d0a-4679-a8ce-7fa7c40e04ab",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3436d138-2c4f-4840-a79e-04861bdc7ce8",
+              "name": "output",
+              "value": "={{ $json.characters }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        0
+      ],
+      "id": "126d3e08-efe0-4105-852d-51eb0d3e40bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.characters }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -144
+      ],
+      "id": "613c90cf-0aca-4b7b-a101-c57f77cdb400",
+      "name": "Chat",
+      "webhookId": "306f7303-187f-41d3-9a0c-c54f9dd33a9a"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "6ea57fad-91c2-4402-8669-e6b9ba80e681",
+  "activeVersionId": null,
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-22T15:25:21.309Z",
+      "createdAt": "2026-04-22T15:25:21.309Z",
+      "role": "workflow:owner",
+      "workflowId": "MAwQzsvYfYvk9uuG",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
