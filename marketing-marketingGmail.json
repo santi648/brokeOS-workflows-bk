@@ -1,0 +1,465 @@
+{
+  "updatedAt": "2026-06-10T15:08:24.757Z",
+  "createdAt": "2026-06-03T22:10:33.203Z",
+  "id": "XITSSNlxGUFusyfh",
+  "name": "Marketing",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "42d726b3-5e3c-40c3-905f-023a61c8a6ac",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "rawBody": false,
+          "responseHeaders": {
+            "entries": []
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "6934d77e-ffae-4c28-9152-e75c21ef7067",
+      "name": "Webhook",
+      "webhookId": "42d726b3-5e3c-40c3-905f-023a61c8a6ac"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        128
+      ],
+      "id": "589cf01a-387c-472d-8937-be3c03111f76",
+      "name": "Extract from File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const binaryKey = Object.keys(item.binary ?? {})[0];\n  \n  if (!binaryKey) throw new Error(`Item sin campo binario`);\n\n  return {\n    json: item.json,\n    binary: {\n      file: item.binary[binaryKey]\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        144
+      ],
+      "id": "d80772fc-1cb5-4463-9887-95518b4eecf3",
+      "name": "Code in JavaScript",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"idExecution\": \"{{ $execution.id }}\",\n  \"status\":\"success\"\n} ",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        656,
+        112
+      ],
+      "id": "ec10a958-3ec2-4688-9961-8fdb97b806ba",
+      "name": "Respond to Webhook1",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "enableResponseOutput": true,
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ \nstatus: 'error',\nidExecution: $execution.id,\n\"message\": $json?.error ?? 'Unknown error', \"nodeWithError\" :  $prevNode.name, \nmessageError: `Error durante la ejecución ${$execution.id} el Nodo afectado fue ${$prevNode.name} - Detalles:${$json.error ?? \"Unknown error\"}`  }) }}",
+        "options": {
+          "responseCode": 500,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "nodeError",
+                "value": "={{$prevNode.name}}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        656,
+        464
+      ],
+      "id": "e0d1df9a-3f7b-4b43-9a92-9ef85d82aad8",
+      "name": "Respond Error1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Error durante la ejecución {{ $execution.id }}: Nodo afectado {{ $json.response.headers.nodeerror }} - Detalles:{{ $json.response.body.message ?? 'Unknown error' }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        912,
+        480
+      ],
+      "id": "85adfc7f-18e2-474e-91d6-53505ea90e28",
+      "name": "Stop and Error"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Respond Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond Error1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "wbhk-n8n.branchtech.co",
+            "user-agent": "curl/8.18.0",
+            "content-length": "2738",
+            "accept": "*/*",
+            "content-type": "text/csv",
+            "x-forwarded-for": "177.93.44.219",
+            "x-forwarded-host": "wbhk-n8n.branchtech.co",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "f795418d4e89",
+            "x-real-ip": "177.93.44.219",
+            "accept-encoding": "gzip"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://wbhk-n8n.branchtech.co/webhook/42d726b3-5e3c-40c3-905f-023a61c8a6ac",
+          "executionMode": "production"
+        },
+        "binary": {
+          "data": {
+            "mimeType": "text/csv",
+            "fileType": "text",
+            "fileExtension": "csv",
+            "data": "database",
+            "fileName": "62238edb-3c45-40cb-a034-b4b0722ed366",
+            "id": "database:13984ff6-cce3-418f-9d4e-af05d672dbfc",
+            "fileSize": "2.74 kB",
+            "bytes": 2738
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "e52f1a46-7493-461b-a99a-f95131cc3ae3",
+  "activeVersionId": "e52f1a46-7493-461b-a99a-f95131cc3ae3",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-03T22:10:33.203Z",
+      "createdAt": "2026-06-03T22:10:33.203Z",
+      "role": "workflow:owner",
+      "workflowId": "XITSSNlxGUFusyfh",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-10T15:08:35.732Z",
+    "createdAt": "2026-06-10T15:08:24.759Z",
+    "versionId": "e52f1a46-7493-461b-a99a-f95131cc3ae3",
+    "workflowId": "XITSSNlxGUFusyfh",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "42d726b3-5e3c-40c3-905f-023a61c8a6ac",
+          "responseMode": "responseNode",
+          "options": {
+            "allowedOrigins": "*",
+            "rawBody": false,
+            "responseHeaders": {
+              "entries": []
+            }
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -32,
+          144
+        ],
+        "id": "6934d77e-ffae-4c28-9152-e75c21ef7067",
+        "name": "Webhook",
+        "webhookId": "42d726b3-5e3c-40c3-905f-023a61c8a6ac"
+      },
+      {
+        "parameters": {
+          "binaryPropertyName": "file",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.extractFromFile",
+        "typeVersion": 1.1,
+        "position": [
+          448,
+          128
+        ],
+        "id": "589cf01a-387c-472d-8937-be3c03111f76",
+        "name": "Extract from File",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all().map(item => {\n  const binaryKey = Object.keys(item.binary ?? {})[0];\n  \n  if (!binaryKey) throw new Error(`Item sin campo binario`);\n\n  return {\n    json: item.json,\n    binary: {\n      file: item.binary[binaryKey]\n    }\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          192,
+          144
+        ],
+        "id": "d80772fc-1cb5-4463-9887-95518b4eecf3",
+        "name": "Code in JavaScript",
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={\n  \"idExecution\": \"{{ $execution.id }}\",\n  \"status\":\"success\"\n} ",
+          "options": {
+            "responseCode": 200
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          656,
+          112
+        ],
+        "id": "ec10a958-3ec2-4688-9961-8fdb97b806ba",
+        "name": "Respond to Webhook1",
+        "retryOnFail": false,
+        "onError": "continueErrorOutput"
+      },
+      {
+        "parameters": {
+          "enableResponseOutput": true,
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify({ \nstatus: 'error',\nidExecution: $execution.id,\n\"message\": $json?.error ?? 'Unknown error', \"nodeWithError\" :  $prevNode.name, \nmessageError: `Error durante la ejecución ${$execution.id} el Nodo afectado fue ${$prevNode.name} - Detalles:${$json.error ?? \"Unknown error\"}`  }) }}",
+          "options": {
+            "responseCode": 500,
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "nodeError",
+                  "value": "={{$prevNode.name}}"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          656,
+          464
+        ],
+        "id": "e0d1df9a-3f7b-4b43-9a92-9ef85d82aad8",
+        "name": "Respond Error1",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "errorMessage": "=Error durante la ejecución {{ $execution.id }}: Nodo afectado {{ $json.response.headers.nodeerror }} - Detalles:{{ $json.response.body.message ?? 'Unknown error' }}"
+        },
+        "type": "n8n-nodes-base.stopAndError",
+        "typeVersion": 1,
+        "position": [
+          912,
+          480
+        ],
+        "id": "85adfc7f-18e2-474e-91d6-53505ea90e28",
+        "name": "Stop and Error"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract from File": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond Error1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Extract from File",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond Error1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Respond to Webhook1": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Respond Error1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Respond Error1": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Stop and Error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version e52f1a46",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-06-04T17:23:04.707Z",
+      "createdAt": "2026-06-04T17:23:04.707Z",
+      "id": "U83PTXycoRQHQxgE",
+      "name": "marketingGmail"
+    }
+  ]
+}
