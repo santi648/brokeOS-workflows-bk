@@ -1,0 +1,1052 @@
+{
+  "updatedAt": "2026-06-23T08:59:53.261Z",
+  "createdAt": "2026-05-08T06:09:47.784Z",
+  "id": "KUJTqpH70yY5MC9M",
+  "name": "Reporte MT5 con Orquestador",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        2400,
+        1024
+      ],
+      "id": "baa5d61f-91bd-4bd6-b534-fbdf21c337c6",
+      "name": "When chat message received",
+      "webhookId": "4f52295d-0e99-49fa-8d89-c9798e1401af"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Eres un orquestador de reportes para una plataforma MT5. Analiza el mensaje del usuario y extrae EXACTAMENTE estos campos:\n\n- intent: acción solicitada\n  - \"inactive_report\": pide reporte/lista de usuarios inactivos (con o sin email, con o sin sheet)\n  - \"unknown\": solicitud que no entiendes\n- date: fecha de corte en formato YYYY-MM-DD HH:mm:ss\n  - Hoy es {{ $now.format('YYYY-MM-DD') }}\n  - \"últimos 30 días\" → resta 30 días desde hoy\n  - \"último mes\" → primer día del mes anterior\n  - Si no hay fecha → usa \"1970-01-01 00:00:00\"\n- recipientEmail: correo destinatario si lo menciona, cadena vacía si no\n\nDevuelve SOLO el JSON estructurado sin texto adicional."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2832,
+        912
+      ],
+      "id": "e544baad-e84a-4479-9957-6afa951e37d8",
+      "name": "Orquestador"
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        1232
+      ],
+      "id": "13d3610c-9b78-4cb9-8a23-32d3d9906e7f",
+      "name": "Ollama Orquestador",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        3616,
+        624
+      ],
+      "id": "0d8cc693-9a99-4505-a5f3-c15781e15fbc",
+      "name": "Respuesta al chat"
+    },
+    {
+      "parameters": {
+        "subject": "=Reporte Usuarios Inactivos MT5 — Corte: {{$json.date}}",
+        "message": "=<h2>Reporte de Usuarios Inactivos — MT5</h2><p>Se encontraron <strong>{{$json.total}} usuarios</strong> sin acceso desde el <strong>{{$json.date}}</strong>.</p><p><a href=\"{{$json.sheetUrl}}\">📊 Ver reporte completo en Google Sheets</a></p><hr><p style=\"color:#888;font-size:11px\">Generado automáticamente</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        3392,
+        624
+      ],
+      "id": "3c1e14e3-886d-41ad-9716-31c6af3ee3a2",
+      "name": "Enviar correo",
+      "webhookId": "ec403784-bb25-442d-aa35-ad13ed910c62",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rYlfmBHKbx5tciTg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const first = items[0].json;\nreturn [{ json: {\n  sheetUrl: first._sheetUrl,\n  sheetId: first._sheetId,\n  recipientEmail: first._recipientEmail,\n  date: first._date,\n  total: first._total\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3168,
+        624
+      ],
+      "id": "1fa794f4-f4d5-4ae7-aec2-1de84f4b8312",
+      "name": "Consolidar para Gmail"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$json._sheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{$json._sheetName}}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Login": "={{$json.Login}}",
+            "FullName": "={{$json.FullName}}",
+            "LastAccess": "={{$json.LastAccess}}"
+          },
+          "matchingColumns": [
+            "Login"
+          ],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2944,
+        624
+      ],
+      "id": "115600d8-466e-40bc-af88-f41aaac3b6ba",
+      "name": "Escribir filas en Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const sheetId = $input.first().json.spreadsheetId;\nconst sheetUrl = $input.first().json.spreadsheetUrl;\nconst users = $('Agrupar usuarios').first().json.users;\nconst params = $('Parsear parámetros').first().json;\n\nreturn users.map(u => ({\n  json: {\n    Login: String(u.Login),\n    FullName: u.FullName || '',\n    LastAccess: u.LastAccess || '',\n    _sheetId: sheetId,\n    _sheetUrl: sheetUrl,\n    _sheetName: 'Usuarios Inactivos',\n    _recipientEmail: params.recipientEmail,\n    _date: params.date,\n    _total: users.length\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        624
+      ],
+      "id": "53749508-15ad-4135-8f27-d915942db094",
+      "name": "Preparar filas"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "Usuarios Inactivos MT5",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Usuarios Inactivos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2512,
+        624
+      ],
+      "id": "c49612d7-8ff9-44b2-aa7b-8bb65959368d",
+      "name": "Crear Google Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        624
+      ],
+      "id": "22580dcf-696e-4914-b590-830fd919eebe",
+      "name": "Agrupar usuarios"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT Login, CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName, LastAccess FROM mt5_users WHERE LastAccess < '{{$json.date}}' ORDER BY LastAccess ASC LIMIT 500;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        624
+      ],
+      "id": "ae7dea1a-1014-425e-a684-f929de417451",
+      "name": "Obtener usuarios inactivos",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "={{$json.intent}}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1680,
+        640
+      ],
+      "id": "ef327553-95b8-4ff9-8877-6df73b06cf5f",
+      "name": "Switch intención"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -656,
+        512
+      ],
+      "id": "3639ecce-7c39-4620-893a-cafa8b9b2544",
+      "name": "Delete table or rows",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -288,
+        368
+      ],
+      "id": "18519346-d3e0-43ee-b498-265278860837",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "jp3LhuGdQzgQ6kZR",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI('To', '', 'string') }}",
+        "subject": "={{ $fromAI('Subject', '', 'string') }}",
+        "message": "={{ $fromAI('Message', '', 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        416
+      ],
+      "id": "a896b86a-180d-455e-a1ae-6252e5db9ea5",
+      "name": "Send a message in Gmail",
+      "webhookId": "c2bcf61e-6721-4c0e-abd8-6facc25c7842",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rYlfmBHKbx5tciTg",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $fromAI('Document', 'ID del Google Sheet donde se escribirán los datos', 'string') }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $fromAI('Sheet', 'Nombre de la hoja dentro del documento', 'string') }}"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "Login": "={{ $fromAI('Login', 'Login del usuario obtenido del resultado SQL de getUsersInactive', 'string') }}",
+            "FullName": "={{ $fromAI('FullName', 'Nombre completo del usuario obtenido del resultado SQL de getUsersInactive', 'string') }}",
+            "LastAccess": "={{ $fromAI('LastAccess', 'Fecha del último acceso obtenida del resultado SQL de getUsersInactive en formato YYYY-MM-DD HH:mm:ss', 'string') }}"
+          },
+          "matchingColumns": [
+            "Login"
+          ],
+          "schema": [
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "chatInput",
+              "displayName": "chatInput",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Document",
+              "displayName": "Document",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FullName",
+              "displayName": "FullName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LastAccess",
+              "displayName": "LastAccess",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Login",
+              "displayName": "Login",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sheet",
+              "displayName": "Sheet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "toolCallId",
+              "displayName": "toolCallId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        496
+      ],
+      "id": "42190698-fdac-4518-8916-0d64fa49010e",
+      "name": "Append or update row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "={{ $fromAI('Title', '', 'string') }}",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "={{ $fromAI('sheetValues0_Title', '', 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        448
+      ],
+      "id": "0d586744-33c5-4abc-8959-72f80e3764cc",
+      "name": "Create spreadsheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  Login,\n  CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName,\n  LastAccess\nFROM mt5_users\nWHERE LastAccess < '{{ $fromAI(\"values0_Value\", \"fecha YYYY-MM-DD HH:mm:ss\", \"string\") }}'\nORDER BY LastAccess ASC\nlimit 10;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySqlTool",
+      "typeVersion": 2.5,
+      "position": [
+        112,
+        336
+      ],
+      "id": "280fc8ea-0fa1-44cb-8e0d-3e3705bf363e",
+      "name": "getUsersInactive",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-oss:120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        336
+      ],
+      "id": "95afab22-72ca-4764-950b-51fd91ce3999",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "## Contexto\nEres un asistente especializado en consultar y reportar información de usuarios de una plataforma de trading (MetaTrader 5).\n\n---\n\n## Base de datos\n\n### Tabla de usuarios\n- Los usuarios están en la tabla `mt5_users`\n- Columnas de nombre: `FirstName`, `LastName`, `MiddleName`\n- El campo `Login` es el identificador único del usuario\n- El campo `LastAccess` es un DATETIME de MySQL con formato `YYYY-MM-DD HH:mm:ss`\n  (ejemplo: `2026-01-01 14:00:51`)\n\n---\n\n## Herramientas disponibles\n\n### `getUsersInactive`\n- **Propósito**: Buscar usuarios que no se han conectado desde una fecha determinada\n- **Cómo usarla**: Filtra por `LastAccess` menor a una fecha dada en formato `YYYY-MM-DD HH:mm:ss`\n- Si el usuario da una fecha sin hora, completa con `00:00:00` (ejemplo: `2026-04-23 00:00:00`)\n- Para fechas relativas como \"últimos 30 días\", calcula la fecha exacta restando desde hoy\n- El resultado ya incluye `FullName` (nombre completo concatenado) y `LastAccess`\n\n### `Create spreadsheet in Google Sheets`\n- **Propósito**: Crear un nuevo Google Sheet\n- **Cuándo usarla**: SOLO si no existe un Sheet previo guardado en memoria\n- **Importante**: Después de crearlo, guarda el ID del documento en memoria para usarlo en el futuro\n- El nombre del Sheet siempre debe ser: `Usuarios Inactivos MT5`\n\n### `Append or update row in sheet in Google Sheets`\n- **Propósito**: Agregar o actualizar filas en un Google Sheet existente con los datos de usuarios inactivos\n- **Cuándo usarla**: Siempre que ya exista un Sheet creado previamente (usa el ID guardado en memoria)\n- **IMPORTANTE**: Debes llamar esta tool UNA VEZ POR CADA USUARIO retornado por `getUsersInactive`\n- Para cada usuario pasa EXACTAMENTE estos campos con los valores del resultado SQL:\n  - **Login**: valor del campo `Login` del resultado SQL\n  - **FullName**: valor del campo `FullName` del resultado SQL\n  - **LastAccess**: valor del campo `LastAccess` del resultado SQL\n- NO uses datos del contexto de conversación, sessionId, chatInput ni ningún otro campo\n- NUNCA leas el contenido del Sheet, solo escribe en él\n- El campo de match para evitar duplicados es `Login`\n\n### `Send a message in Gmail`\n- **Propósito**: Enviar un correo electrónico\n- **Cuándo usarla**: Cuando el usuario pida enviar el reporte por correo\n- **Flujo correcto**:\n  1. Primero obtén los datos con `getUsersInactive`\n  2. Si el usuario pide también el Sheet, créalo o actualízalo primero\n  3. Luego envía el correo incluyendo el enlace al Sheet y un resumen de los usuarios inactivos en el cuerpo del mensaje\n- **Si no se especifica destinatario**: pregunta al usuario a qué correo lo envía\n\n---\n\n## Flujo recomendado para reporte completo\n\nCuando el usuario pida \"enviar reporte de usuarios inactivos por correo\":\n1. Llama `getUsersInactive` con la fecha indicada → obtienes array de usuarios desde MySQL\n2. Verifica en memoria si ya existe un Google Sheet ID guardado\n   - **Sí existe** → actualiza con `Append or update row in sheet` (una llamada por usuario)\n   - **No existe** → crea con `Create spreadsheet`, guarda el ID, luego inserta filas (una llamada por usuario)\n3. Envía el correo con `Send a message in Gmail` incluyendo:\n   - Enlace al Google Sheet\n   - Número total de usuarios inactivos encontrados\n   - Fecha del corte usado\n\n---\n\n## Memoria del Sheet\n- El ID del Google Sheet debe guardarse en la memoria de la conversación la primera vez que se cree\n- En conversaciones futuras, antes de crear un Sheet nuevo, SIEMPRE verifica si ya hay un ID guardado\n- El nombre del Sheet al crearlo debe ser: `Usuarios Inactivos MT5`\n\n---\n\n## Reglas generales\n- Si no se especifica fecha de inactividad, pregunta al usuario qué período quiere consultar\n- Nunca muestres solo el Login, siempre usa el nombre completo (`FullName`)\n- Si falta algún dato para completar una acción (correo, fecha, etc.), pregunta antes de ejecutar\n- Responde siempre en español"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -304,
+        112
+      ],
+      "id": "47b089dc-2d4e-431b-9209-19390d3d31a5",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1,
+      "position": [
+        3088,
+        1296
+      ],
+      "id": "c229e284-f0eb-42c7-9a36-5ded7c6c89a6",
+      "name": "Parser estructurado"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        4976,
+        1008
+      ],
+      "id": "976088cd-e16c-4639-acbf-86f46b9f0ee4",
+      "name": "Respuesta al chat1"
+    },
+    {
+      "parameters": {
+        "subject": "=Reporte Usuarios Inactivos MT5 — Corte: {{$json.date}}",
+        "message": "=<h2>Reporte de Usuarios Inactivos — MT5</h2><p>Se encontraron <strong>{{$json.total}} usuarios</strong> sin acceso desde el <strong>{{$json.date}}</strong>.</p><p><a href=\"{{$json.sheetUrl}}\">📊 Ver reporte completo en Google Sheets</a></p><hr><p style=\"color:#888;font-size:11px\">Generado automáticamente</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        4768,
+        1008
+      ],
+      "id": "8e546f1d-1e62-4c08-93a4-5d27c259d8b3",
+      "name": "Enviar correo1",
+      "webhookId": "886e7505-cfa3-4ead-8034-7eeb07416a4e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rYlfmBHKbx5tciTg",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "={{$json._sheetId}}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{$json._sheetName}}"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Login": "={{$json.Login}}",
+            "FullName": "={{$json.FullName}}",
+            "LastAccess": "={{$json.LastAccess}}"
+          },
+          "matchingColumns": [
+            "Login"
+          ],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        4320,
+        1008
+      ],
+      "id": "d75e934d-0698-4259-91e7-37424754ca56",
+      "name": "Escribir filas en Sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const sheetId = $input.first().json.spreadsheetId;\nconst sheetUrl = $input.first().json.spreadsheetUrl;\nconst users = $('Agrupar usuarios1').first().json.users;\nconst params = $('Orquestador').first().json;\n\nif (!users || users.length === 0) {\n  throw new Error('No se encontraron usuarios inactivos para la fecha: ' + params.date);\n}\n\nreturn users.map(u => ({\n  json: {\n    Login: String(u.Login),\n    FullName: u.FullName || '',\n    LastAccess: u.LastAccess || '',\n    _sheetId: sheetId,\n    _sheetUrl: sheetUrl,\n    _sheetName: 'Usuarios Inactivos',\n    _recipientEmail: params.recipientEmail || '',\n    _date: params.date,\n    _total: users.length\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4096,
+        1008
+      ],
+      "id": "d1b01a67-6a58-4a89-b34b-ae5338da4b05",
+      "name": "Preparar filas1"
+    },
+    {
+      "parameters": {
+        "resource": "spreadsheet",
+        "title": "Usuarios Inactivos MT5",
+        "sheetsUi": {
+          "sheetValues": [
+            {
+              "title": "Usuarios Inactivos"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        3888,
+        1008
+      ],
+      "id": "71733171-4778-4b7c-9ca9-118bb71ee633",
+      "name": "Crear Google Sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BwM5digEGzX6yKRy",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "users",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        1008
+      ],
+      "id": "18fd3e99-713a-41ca-a486-1b7900da2702",
+      "name": "Agrupar usuarios1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT Login, CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName, LastAccess FROM mt5_users WHERE LastAccess < '{{$json.date}}' ORDER BY LastAccess ASC LIMIT 500;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        3440,
+        1008
+      ],
+      "id": "8ea2736c-6e98-4a1c-af7c-ed48349b3af7",
+      "name": "Obtener usuarios inactivos1",
+      "credentials": {
+        "mySql": {
+          "id": "NopIcsahOQe5ykJm",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "={{$json.intent}}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        3216,
+        1008
+      ],
+      "id": "47d568d0-a4b7-4908-8234-9873a7e3f4a1",
+      "name": "Switch intención1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const first = items[0].json;\nreturn [{ json: {\n  sheetUrl: first._sheetUrl,\n  recipientEmail: first._recipientEmail,\n  date: first._date,\n  total: first._total\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        1008
+      ],
+      "id": "53423a5c-9026-4e84-8ced-3a64452d047d",
+      "name": "Consolidar"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        3440,
+        1200
+      ],
+      "id": "221e4d33-452c-4dce-ab7e-fe67b1cd2d87",
+      "name": "Respuesta desconocida"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Orquestador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Orquestador": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orquestador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orquestador": {
+      "main": [
+        [
+          {
+            "node": "Switch intención1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar correo": {
+      "main": [
+        [
+          {
+            "node": "Respuesta al chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar para Gmail": {
+      "main": [
+        [
+          {
+            "node": "Enviar correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir filas en Sheet": {
+      "main": [
+        [
+          {
+            "node": "Consolidar para Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar filas": {
+      "main": [
+        [
+          {
+            "node": "Escribir filas en Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Preparar filas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar usuarios": {
+      "main": [
+        [
+          {
+            "node": "Crear Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener usuarios inactivos": {
+      "main": [
+        [
+          {
+            "node": "Agrupar usuarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch intención": {
+      "main": [
+        [
+          {
+            "node": "Obtener usuarios inactivos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create spreadsheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getUsersInactive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar correo1": {
+      "main": [
+        [
+          {
+            "node": "Respuesta al chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir filas en Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Consolidar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar filas1": {
+      "main": [
+        [
+          {
+            "node": "Escribir filas en Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Google Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Preparar filas1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar usuarios1": {
+      "main": [
+        [
+          {
+            "node": "Crear Google Sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener usuarios inactivos1": {
+      "main": [
+        [
+          {
+            "node": "Agrupar usuarios1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch intención1": {
+      "main": [
+        [
+          {
+            "node": "Obtener usuarios inactivos1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta desconocida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidar": {
+      "main": [
+        [
+          {
+            "node": "Enviar correo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "b41dd1ee-5afe-48ab-9da7-4006e3143df9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-08T06:09:47.784Z",
+      "createdAt": "2026-05-08T06:09:47.784Z",
+      "role": "workflow:owner",
+      "workflowId": "KUJTqpH70yY5MC9M",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
