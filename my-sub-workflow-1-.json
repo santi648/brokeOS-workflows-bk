@@ -1,0 +1,115 @@
+{
+  "updatedAt": "2026-05-25T14:55:03.793Z",
+  "createdAt": "2026-04-15T18:03:32.075Z",
+  "id": "wewebYAkv4Pv93Sk",
+  "name": "My Sub-Workflow 1",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        160,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gemma3:4b",
+          "mode": "list",
+          "cachedResultName": "gemma3:4b"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=dime que numero es : {{ $json.message.DatetimeMsc }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        448,
+        352
+      ],
+      "id": "837c4a5d-3b25-415b-b3f4-cff2955d4a95",
+      "name": "Message a model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "M6eSXW0lrqBGc3cU",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "event": "message",
+          "message": {
+            "type": "tick",
+            "Symbol": "Crash 1000 Index",
+            "Datetime": 1777908608,
+            "DatetimeMsc": 1777908608241,
+            "Bid": 5575.1769,
+            "Ask": 5575.6831,
+            "Last": 0,
+            "VolumeExt": 0,
+            "Flags": 14
+          },
+          "ws": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "versionId": "9bd22787-38f0-4688-b02f-511b5cd1881d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-15T18:03:32.075Z",
+      "createdAt": "2026-04-15T18:03:32.075Z",
+      "role": "workflow:owner",
+      "workflowId": "wewebYAkv4Pv93Sk",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
