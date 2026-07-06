@@ -1,0 +1,176 @@
+{
+  "updatedAt": "2026-06-05T15:55:50.583Z",
+  "createdAt": "2026-06-05T15:55:50.583Z",
+  "id": "2bzgmjAskgxbuE3V",
+  "name": "userLogin",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "-1003743218323",
+        "text": "=🟢 El usuario {{ $json.message_name }} con el login {{ $json.message_login  }} se conecto ",
+        "replyMarkup": "none",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -96
+      ],
+      "id": "590c0afb-b48b-4bfa-aeb1-a55436586a96",
+      "name": "login",
+      "disabled": false,
+      "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+      "issues": {},
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "id": "24b7580b-f74e-47c9-9953-c19a1b71248a",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        128,
+        -96
+      ],
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message_login",
+              "type": "any"
+            },
+            {
+              "name": "message_name",
+              "type": "any"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": null,
+  "versionId": "37107f4e-5e37-49ce-841a-a44e18712bd9",
+  "activeVersionId": "37107f4e-5e37-49ce-841a-a44e18712bd9",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-05T15:55:50.583Z",
+      "createdAt": "2026-06-05T15:55:50.583Z",
+      "role": "workflow:owner",
+      "workflowId": "2bzgmjAskgxbuE3V",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-05T15:55:50.583Z",
+    "createdAt": "2026-06-05T15:55:50.583Z",
+    "versionId": "37107f4e-5e37-49ce-841a-a44e18712bd9",
+    "workflowId": "2bzgmjAskgxbuE3V",
+    "nodes": [
+      {
+        "type": "n8n-nodes-base.telegram",
+        "parameters": {
+          "resource": "message",
+          "operation": "sendMessage",
+          "chatId": "-1003743218323",
+          "text": "=🟢 El usuario {{ $json.message_name }} con el login {{ $json.message_login  }} se conecto ",
+          "replyMarkup": "none",
+          "additionalFields": {
+            "appendAttribution": false
+          }
+        },
+        "typeVersion": 1.2,
+        "position": [
+          336,
+          -96
+        ],
+        "id": "590c0afb-b48b-4bfa-aeb1-a55436586a96",
+        "name": "login",
+        "disabled": false,
+        "webhookId": "fe3f2686-8ec3-4920-b0bc-abe6e9e0c013",
+        "issues": {},
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "id": "24b7580b-f74e-47c9-9953-c19a1b71248a",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          128,
+          -96
+        ],
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "message_login",
+                "type": "any"
+              },
+              {
+                "name": "message_name",
+                "type": "any"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "login",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "tags": []
+}
