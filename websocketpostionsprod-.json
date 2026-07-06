@@ -1,0 +1,3137 @@
+{
+  "updatedAt": "2026-07-03T16:41:13.334Z",
+  "createdAt": "2026-05-27T15:43:40.564Z",
+  "id": "1m6Rb043oPBfFSMj",
+  "name": "WebsocketPostionsProd",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "http://188.245.125.1:8010/api/blacklist",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        2656
+      ],
+      "id": "a348fcc0-9cf2-4498-a40b-7174f323b0dd",
+      "name": "getListasMarcadas"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id"
+            },
+            {
+              "name": "action"
+            },
+            {
+              "name": "symbol"
+            },
+            {
+              "name": "volume"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        3552
+      ],
+      "id": "949db59d-474d-419c-beaf-ddb2f9b0a58e",
+      "name": "enviarDatosCuenta"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/blacklist/remove/819298",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        2880
+      ],
+      "id": "997fbf98-ecab-416f-baa1-38896c523034",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=905984"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        4000
+      ],
+      "id": "cdf37565-4b65-4ff9-87d8-45addd9dcd4e",
+      "name": "Redis2",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.kynex.trade:7000/api/token/latest",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-Admin ",
+              "value": "JKG*jCnTYv|V{lq'+?5no3{+nnCEDVd74)[=&'Mi7,zhM8m)P:e)>l2tD+XCrDX9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        4448
+      ],
+      "id": "69a21685-15de-4ab6-b210-743824234ebf",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "bearerProductionPositions",
+        "value": "={{ $json.token }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        4672
+      ],
+      "id": "f79eb3c7-69d3-4cc6-aff2-df89747157f8",
+      "name": "Redis5",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kynex.trade:7100/api/positions_history/{{ $(\"Code in JavaScript\").item.json.login }}/{{ $(\"Code in JavaScript\").item.json.positions[0].time_create }}&per_page=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        3776
+      ],
+      "id": "217cf38b-b6dc-4598-b787-7fc59042533e",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=905984"
+            },
+            {
+              "name": "action",
+              "value": "=close"
+            },
+            {
+              "name": "symbol",
+              "value": "=BullX500."
+            },
+            {
+              "name": "volume",
+              "value": "=0.3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        3328
+      ],
+      "id": "98277a72-a4f2-4227-9cd2-18dd70bb6b49",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "open",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageOpenWS"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                    "leftValue": "={{ $json.event }}",
+                    "rightValue": "message",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "messageWS"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1328,
+        832
+      ],
+      "id": "cdf96c40-9bee-4a5f-be18-bd8bf54b0167",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "loginsMarcadosProduccion",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        1024
+      ],
+      "id": "84ccf02d-2c02-4772-aa1d-b405ba1444e5",
+      "name": "loginsMarcadosProduccion2",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Switch4').first().json.message;\nconst accounts = data.accounts;\n\nconst rawMarcados = $('loginsMarcadosProduccion2').first().json.propertyName;\nconst listaLogins = JSON.parse(rawMarcados).map(l => String(l));\n\nconst removedLogins = (data.removed_logins ?? []).map(l => String(l));\n\n// Snapshot de Redis — todas las keys pos:login:position_id activas\nconst rawSnapshot = $('Redis_Snapshot').first().json;\nconst redisKeys = Object.keys(rawSnapshot).filter(k => k.startsWith('pos:'));\n\nconst symbolsAllowed = [\n  \"BearX1000.\",\"BearX400.\",\"BearX500.\",\"BearX777.\",\"BearX900.\",\n  \"BullX1000.\",\"BullX400.\",\"BullX500.\",\"BullX777.\",\"BullX900.\",\n  \"EmasVol10\",\"EmasVol100\",\"EmasVol20\",\"EmasVol30\",\"EmasVol40\",\n  \"EmasVol50\",\"EmasVol60\",\"EmasVol70\",\"EmasVol80\",\"EmasVol90\",\n  \"FomoX111.\",\"FomoX333.\",\"FomoX555.\",\"FomoX888.\",\"FomoX999.\",\n  \"FomoXpeed100.\",\"Fortune100.\",\"Fortune1000.\",\"Fortune250.\",\n  \"Fortune500.\",\"FortuneX200.\",\"FortuneX300.\",\"FortuneX500.\",\n  \"LionX100\",\"LionX120\",\"LionX150\",\"LionX200\",\"LionX25\",\n  \"LionX40\",\"LionX50\",\"LionX60\",\"LionX75\",\"LionX90\",\n  \"VorteX100.\",\"VorteX20.\",\"VorteX40.\",\"VorteX60.\",\"VorteX80.\",\n  \"XpeedDown200\",\"XpeedDown300\",\"XpeedUp200\",\"XpeedUp300\"\n];\n\nconst VENTANA_SEGUNDOS = 15;\nconst ahoraEnSegundos = Math.floor(data.timestamp_msc / 1000);\n\n// ── OPEN ──────────────────────────────────────────────────────────────────────\nconst cuentasMarcadas = accounts\n  .filter(account => listaLogins.includes(String(account.login)))\n  .flatMap(account => {\n    const positionsFiltradas = (account.positions ?? []).filter(position => {\n      const diff = ahoraEnSegundos - position.time_create;\n      return diff >= 0 && diff <= VENTANA_SEGUNDOS && symbolsAllowed.includes(position.symbol);\n    });\n    return positionsFiltradas.map(position => ({\n      json: {\n        login: String(account.login),\n        name: account.name,\n        estado: \"OPEN\",\n        direccion: position.action,\n        position_id: position.ticket,\n        symbol: position.symbol,\n        volume: position.volume,\n        time_create: position.time_create\n      }\n    }));\n  });\n\n// ── CLOSE por removed_logins ──────────────────────────────────────────────────\nconst cuentasEliminadas = removedLogins\n  .filter(login => listaLogins.includes(login))\n  .map(login => ({\n    json: { login, estado: \"CLOSE\" }\n  }));\n\n// ── CLOSE parcial — posición desapareció del WS pero login sigue activo ───────\n// Set de todas las posiciones activas en este mensaje: \"pos:login:position_id\"\nconst posicionesActivasEnWS = new Set(\n  accounts\n    .filter(account => listaLogins.includes(String(account.login)))\n    .flatMap(account =>\n      (account.positions ?? []).map(p =>\n        \"pos:\" + String(account.login) + \":\" + String(p.ticket)\n      )\n    )\n);\n\nconst cierresParciales = redisKeys\n  .filter(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    // El login sigue en el WS (no está en removed_logins)\n    // pero esta posición específica ya no aparece en su array positions\n    const loginSigueEnWS = accounts.some(a => String(a.login) === loginDeKey);\n    const loginEstaEnRemoved = removedLogins.includes(loginDeKey);\n    return loginSigueEnWS && !loginEstaEnRemoved && !posicionesActivasEnWS.has(key);\n  })\n  .map(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    return {\n      json: {\n        login: loginDeKey,\n        estado: \"CLOSE\"\n      }\n    };\n  });\n\nreturn [...cuentasMarcadas, ...cuentasEliminadas, ...cierresParciales];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        1024
+      ],
+      "id": "d9e1e6c8-67ef-449b-bb2d-17e416dfdcf0",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.estado }}",
+                    "rightValue": "OPEN",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "9314909a-6079-4190-87c5-aa2e2ddf685b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "OPEN"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a2cda040-6229-443a-9c3e-7ad0a779bfac",
+                    "leftValue": "={{ $json.estado }}",
+                    "rightValue": "CLOSE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CLOSE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        1024
+      ],
+      "id": "8030b0e2-53a5-498e-bac1-71840fc090ce",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "=propertyName",
+        "key": "={{\"pos:\"+ $json.login + \":\" + $json.position_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        928
+      ],
+      "id": "638e258c-9b7a-46d8-af71-2958c442d039",
+      "name": "Redis_ReadOpen",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code_DedupOpen — versión final correcta\nconst redisResult = $input.all(); // array de items, uno por posición\n\nreturn redisResult\n  .map((redisItem, index) => {\n    const propertyName = redisItem.json.propertyName ?? null;\n    \n    // Si ya existe en Redis → duplicado, ignorar este item\n    if (propertyName) return null;\n    \n    // Recuperar el item original del Switch3 por índice\n    const originalItem = $('Switch3').all()[index]?.json;\n    if (!originalItem) return null;\n    \n    return { json: { ...originalItem } };\n  })\n  .filter(item => item !== null);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        928
+      ],
+      "id": "8f90d8aa-c193-42ae-b476-9a1947715193",
+      "name": "Code_DedupOpen"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=pos:{{ $json.login }}:{{ $json.position_id }}",
+        "value": "={{ JSON.stringify({ position_id: $json.position_id, unix_stamp: $json.time_create, login: $json.login, symbol: $json.symbol }) }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        240,
+        928
+      ],
+      "id": "07b64667-9ccc-46b0-b9bb-40af43b6c8f5",
+      "name": "Redis11",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            },
+            {
+              "name": "volume",
+              "value": "={{ $json.volume }}"
+            },
+            {
+              "name": "direction",
+              "value": "={{ $json.direccion }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        464,
+        1024
+      ],
+      "id": "447e4fc9-9570-4ccf-a072-996af0126d66",
+      "name": "HTTP_AlertOpen"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Toma los CLOSE que vienen del Switch3\nconst closeItems = $input.all();\n\n// Reutiliza el snapshot que ya se leyó al inicio\nconst rawSnapshot = $('Redis_Snapshot').first().json;\n\n// Agrupa por login usando solo los logins en CLOSE\nconst byLogin = {};\n\nfor (const item of closeItems) {\n  const loginCierre = String(item.json.login);\n\n  // Filtrar el snapshot por este login\n  for (const [key, rawValue] of Object.entries(rawSnapshot)) {\n    if (!key.startsWith('pos:')) continue;\n\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    if (loginDeKey !== loginCierre) continue;\n\n    const redisData = JSON.parse(rawValue);\n\n    if (!byLogin[loginCierre]) {\n      byLogin[loginCierre] = {\n        login: loginCierre,\n        unix_stamp: redisData.unix_stamp,\n        positions: []\n      };\n    } else if (redisData.unix_stamp < byLogin[loginCierre].unix_stamp) {\n      byLogin[loginCierre].unix_stamp = redisData.unix_stamp;\n    }\n\n    byLogin[loginCierre].positions.push({\n      key,\n      position_id: String(redisData.position_id),\n      symbol: redisData.symbol\n    });\n  }\n}\n\nreturn Object.values(byLogin).map(entry => ({ json: entry }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        1216
+      ],
+      "id": "a12b2c94-5479-45db-b15c-34444eadc747",
+      "name": "Code in JavaScript5",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bearerToken",
+        "key": "bearerProductionPositions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1216
+      ],
+      "id": "97f2b6ae-2d0f-4916-97fc-3aa108a5a9c3",
+      "name": "Redis_Bearer1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        688,
+        1216
+      ],
+      "id": "2e08d909-1d19-4cbb-8293-ae15480c2cbb",
+      "name": "openedOrders3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript6').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const { login, positions } = prev;\n\n  // Para cada posición que mandamos a verificar, buscar en la respuesta\n  return positions.flatMap(pos => {\n    const order = orders.find(o => String(o.position_id) === String(pos.position_id));\n\n    // No encontrada o sigue abierta → ignorar\n    if (!order) return [];\n    if (order.time_close === 0 || order.time_close === null) return [];\n\n    return [{\n      json: {\n        login,\n        position_id:   String(pos.position_id),\n        symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? pos.symbol,\n        volume:        order.deal_internal_out?.lots ?? order.lots,\n        estado_cierre: \"CONFIRMADO\",\n        key:           pos.key\n      }\n    }];\n  });\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        1216
+      ],
+      "id": "7827ee15-540f-45cd-9b18-ec903d9c5009",
+      "name": "Code_VerifyClose1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        1120
+      ],
+      "id": "060564a1-a900-41fa-9e6a-ddc6f1575bee",
+      "name": "Redis_DeleteClose1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code in JavaScript6 — merge bearer con el grupo agrupado por login\nconst allBearer = $input.all();\nconst allPrev = $('Code in JavaScript5').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:      prev.login,\n      unix_stamp: prev.unix_stamp,\n      positions:  prev.positions,   // ← array completo de posiciones del login\n      bearerToken\n    }\n  };\n}).filter(Boolean);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        1216
+      ],
+      "id": "9b01d5e5-424d-4e05-989b-b75e69dc3c2c",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "bearerProductionPositions",
+        "value": "={{ $json.bearerToken }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        640
+      ],
+      "id": "aed77c6a-e140-4e3b-a975-ef535c9b44fa",
+      "name": "Redis14",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=🔴 *LOGIN MARCADO - APERTURA*\n👤 {{ $json.name }} ({{ $json.login }})\n📈 Symbol: {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.position_id }}\n🕐 unix: {{ $json.time_create }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        832
+      ],
+      "id": "6494c990-bf47-4eea-b833-fbf23612f71e",
+      "name": "Telegram Apertura",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003734325193",
+        "text": "=🔴 *LOGIN MARCADO - CIERRE*\nlogin : {{ $json.login }}\nticket : {{ $json.position_id }}\nsymbol : {{ $json.symbol }}\n🕐 {{ $now }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        1312
+      ],
+      "id": "850b2985-16a4-4cc4-ad7f-2ba797c339a3",
+      "name": "Telegram Apertura1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+      "credentials": {
+        "telegramApi": {
+          "id": "FKAlkkTj2ZrArlQ1",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "pos:*:*"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        1024
+      ],
+      "id": "3c33df5f-63af-4a6b-b97a-a15084f72819",
+      "name": "Redis_Snapshot",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "pos:*:*"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        1984
+      ],
+      "id": "e284d05e-73a6-4c1d-b778-201739c8f1ed",
+      "name": "Redis_Snapshot1",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        1872
+      ],
+      "id": "479f8168-c948-4847-b444-097022410c96",
+      "name": "Redis_Snapshot2",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=893149"
+            },
+            {
+              "name": "action",
+              "value": "open"
+            },
+            {
+              "name": "symbol",
+              "value": "=BullX900."
+            },
+            {
+              "name": "volume",
+              "value": "=0.1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        1760
+      ],
+      "id": "6b1490fe-9a80-499e-af47-b12e477ee144",
+      "name": "HTTP_AlertOpen1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=893149"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "=BullX900."
+            },
+            {
+              "name": "volume",
+              "value": "=0.1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        3104
+      ],
+      "id": "33908f04-75db-4ed9-b3bf-b8fb58692368",
+      "name": "HTTP_AlertClose"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "bearerProductionPositions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        4224
+      ],
+      "id": "074399c0-8ed9-4f11-9998-79084ca5886c",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c0sV2K39sM9bBvYc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/c0sV2K39sM9bBvYc",
+          "cachedResultName": "whiteListWorkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_firstItem": "={{ $('Switch4').first().json.message }}"
+          },
+          "matchingColumns": [
+            "message_firstItem"
+          ],
+          "schema": [
+            {
+              "id": "message_firstItem",
+              "displayName": "message_firstItem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -944,
+        816
+      ],
+      "name": "Call whiteListWorkflow",
+      "id": "81c66430-a8f5-4ce6-8180-d43effe1d204"
+    },
+    {
+      "parameters": {
+        "operation": "keys",
+        "keyPattern": "={{ \"pos:\" + \"*\" + \":*\"}}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        2208
+      ],
+      "id": "dde6a957-c3cc-457e-8994-5ae21453538d",
+      "name": "Redis_ReadClose",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const keysObj = $input.first().json;\n\nconst redisKeys = Object.keys(keysObj).filter(k => k.startsWith('pos:'));\nif (redisKeys.length === 0) return [];\n\nreturn redisKeys.map(key => {\n  const parts = key.split(':'); // [\"pos\", \"905984\", \"119133921\"]\n  const login = parts[1];\n  const position_id = parts[2];\n  const redisData = JSON.parse(keysObj[key]);\n  return {\n    json: {\n      login: redisData.login ?? String(login),\n      key,\n      position_id: String(position_id),\n      unix_stamp: redisData.unix_stamp,\n      symbol: redisData.symbol\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1328,
+        2208
+      ],
+      "id": "c69e6b16-d81c-41cc-a3d6-1ec69b35750d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "bearerToken",
+        "key": "bearerProductionPositions",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        2208
+      ],
+      "id": "43588fff-f4ba-4810-9692-7a75b849e6bc",
+      "name": "Redis_Bearer",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.bearerToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        2208
+      ],
+      "id": "b6584b45-1318-4b5f-9a7a-861039cbb537",
+      "name": "openedOrders"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript7').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const positionIdEsperado = String(prev.position_id);\n  const login  = prev.login;\n  const symbol = prev.symbol;\n  const key    = prev.key;\n\n  if (!positionIdEsperado) return [];\n\n  const order = orders.find(o => String(o.position_id) === positionIdEsperado);\n  if (!order) return [];\n  if (order.time_close === 0 || order.time_close === null) return [];\n\n  return [{\n    json: {\n      login,\n      position_id:   positionIdEsperado,\n      symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? symbol,\n      volume:        order.deal_internal_out?.lots ?? order.lots,\n      estado_cierre: \"CONFIRMADO\",\n      key\n    }\n  }];\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        2208
+      ],
+      "id": "6d5c8b40-561f-4213-aad7-5fcc61b591ca",
+      "name": "Code_VerifyClose"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code in JavaScript7 — corregido para múltiples items\nconst allBearer = $input.all();\nconst allPrev = $('Code in JavaScript').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:       prev.login,\n      key:         prev.key,\n      position_id: prev.position_id,\n      unix_stamp:  prev.unix_stamp,\n      symbol:      prev.symbol,\n      bearerToken\n    }\n  };\n}).filter(item => item !== null);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -880,
+        2208
+      ],
+      "id": "2a446173-6244-487f-9ed2-4b384211befc",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            },
+            {
+              "name": "volume",
+              "value": "={{ $json.volume }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        2208
+      ],
+      "id": "ea09737a-5f4d-48b4-906e-fc857e593fc9",
+      "name": "HTTP_AlertClose2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.key }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        2208
+      ],
+      "id": "0c714496-ea8b-41d7-9948-20d6ea566252",
+      "name": "Redis_DeleteClose",
+      "credentials": {
+        "redis": {
+          "id": "FmIJ14WSiatNaRQJ",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "=896326"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "=BearX400."
+            },
+            {
+              "name": "volume",
+              "value": "=0.1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1552,
+        2432
+      ],
+      "id": "405c62da-79b7-43bf-ad61-6c3f25312051",
+      "name": "HTTP_AlertClose3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "account_id",
+              "value": "={{ $json.login }}"
+            },
+            {
+              "name": "action",
+              "value": "close"
+            },
+            {
+              "name": "symbol",
+              "value": "={{ $json.symbol }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1360,
+        1120
+      ],
+      "id": "f6496474-2526-4214-8422-9e1213f1113b",
+      "name": "HTTP_AlertClose4",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst seen = new Set();\n\nreturn items.filter(item => {\n  const login = String(item.json.login);\n  if (seen.has(login)) return false;\n  seen.add(login);\n  return true;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        1216
+      ],
+      "id": "a2c3417f-4b0d-4664-9956-cc2f36550dde",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Asumiendo que el objeto completo viene en el primer item\nconst data = $input.first().json;\n\nreturn Object.keys(data).map(key => {\n  return { json: { key } };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        2000
+      ],
+      "id": "8290ce4b-2c43-4187-aba2-1123c7ffdb25",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "batchSize": 500,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1248,
+        1872
+      ],
+      "id": "db5d5be7-79e8-4e6c-969c-d25713f9a053",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -816,
+        1872
+      ],
+      "id": "b89133c2-4d54-49a5-92b6-d92b4fcc609d",
+      "name": "Wait",
+      "webhookId": "0dd61257-d91b-4152-80f2-9032256f3985"
+    },
+    {
+      "parameters": {
+        "websocketUrl": "wss://api.kynex.trade:7000/ws/profit_update?groups=*&poll_interval_ms=5000",
+        "tokenRefreshEnabled": true,
+        "tokenRefreshMode": "twoStep",
+        "tsStep1Url": "=https://api.kynex.trade:7000/api/token/latest",
+        "tsStep1AdminHeaderValue": "=JKG*jCnTYv|V{lq'+?5no3{+nnCEDVd74)[=&'Mi7,zhM8m)P:e)>l2tD+XCrDX9",
+        "tsStep1ResponsePath": "token",
+        "tsStep2Url": "=https://api.kynex.trade:7000/api/token/refresh",
+        "tsStep2ResponsePath": "=bearer_token",
+        "tokenRefreshTargetParam": "token",
+        "tokenRefreshValuePrefix": "",
+        "tokenRefreshIntervalHours": 14,
+        "maxReconnectAttempts": 3
+      },
+      "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        816
+      ],
+      "id": "7c1b2d06-d838-4cb9-b39f-f325740f3bf1",
+      "name": "WebSocket Kynex Trigger1"
+    }
+  ],
+  "connections": {
+    "getListasMarcadas": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        []
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Redis14",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "loginsMarcadosProduccion2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call whiteListWorkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loginsMarcadosProduccion2": {
+      "main": [
+        [
+          {
+            "node": "Redis_Snapshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Redis_ReadOpen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_ReadOpen": {
+      "main": [
+        [
+          {
+            "node": "Code_DedupOpen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_DedupOpen": {
+      "main": [
+        [
+          {
+            "node": "Redis11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis11": {
+      "main": [
+        [
+          {
+            "node": "Telegram Apertura",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP_AlertOpen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Redis_Bearer1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Bearer1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openedOrders3": {
+      "main": [
+        [
+          {
+            "node": "Code_VerifyClose1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_VerifyClose1": {
+      "main": [
+        [
+          {
+            "node": "Redis_DeleteClose1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram Apertura1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_DeleteClose1": {
+      "main": [
+        [
+          {
+            "node": "HTTP_AlertClose4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "openedOrders3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Snapshot1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP_AlertOpen": {
+      "main": [
+        []
+      ]
+    },
+    "Redis_ReadClose": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Redis_Bearer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Bearer": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "openedOrders": {
+      "main": [
+        [
+          {
+            "node": "Code_VerifyClose",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "openedOrders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code_VerifyClose": {
+      "main": [
+        [
+          {
+            "node": "Redis_DeleteClose",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Apertura1": {
+      "main": [
+        []
+      ]
+    },
+    "Redis_DeleteClose": {
+      "main": [
+        [
+          {
+            "node": "HTTP_AlertClose2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Redis_Snapshot2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis_Snapshot2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WebSocket Kynex Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {
+    "Redis_DeleteClose": [
+      {
+        "json": {
+          "login": "908324",
+          "position_id": "251240650",
+          "symbol": "Fortune100.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:908324:251240650"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "login": "908324",
+          "position_id": "251277493",
+          "symbol": "Fortune100.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:908324:251277493"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      },
+      {
+        "json": {
+          "login": "908324",
+          "position_id": "251259770",
+          "symbol": "Fortune100.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:908324:251259770"
+        },
+        "pairedItem": {
+          "item": 2
+        }
+      },
+      {
+        "json": {
+          "login": "911143",
+          "position_id": "243896784",
+          "symbol": "FomoX555.",
+          "volume": 0.5,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:911143:243896784"
+        },
+        "pairedItem": {
+          "item": 3
+        }
+      },
+      {
+        "json": {
+          "login": "843778",
+          "position_id": "156194055",
+          "symbol": "BearX500.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:843778:156194055"
+        },
+        "pairedItem": {
+          "item": 4
+        }
+      },
+      {
+        "json": {
+          "login": "908324",
+          "position_id": "251251241",
+          "symbol": "Fortune100.",
+          "volume": 0.1,
+          "estado_cierre": "CONFIRMADO",
+          "key": "pos:908324:251251241"
+        },
+        "pairedItem": {
+          "item": 5
+        }
+      }
+    ]
+  },
+  "versionId": "68bed570-d3df-479e-bef1-e8463bb822cd",
+  "activeVersionId": "68bed570-d3df-479e-bef1-e8463bb822cd",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-27T15:43:40.564Z",
+      "createdAt": "2026-05-27T15:43:40.564Z",
+      "role": "workflow:owner",
+      "workflowId": "1m6Rb043oPBfFSMj",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-07-03T16:41:15.216Z",
+    "createdAt": "2026-07-03T16:41:13.336Z",
+    "versionId": "68bed570-d3df-479e-bef1-e8463bb822cd",
+    "workflowId": "1m6Rb043oPBfFSMj",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "http://188.245.125.1:8010/api/blacklist",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          2656
+        ],
+        "id": "a348fcc0-9cf2-4498-a40b-7174f323b0dd",
+        "name": "getListasMarcadas"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id"
+              },
+              {
+                "name": "action"
+              },
+              {
+                "name": "symbol"
+              },
+              {
+                "name": "volume"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          3552
+        ],
+        "id": "949db59d-474d-419c-beaf-ddb2f9b0a58e",
+        "name": "enviarDatosCuenta"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/blacklist/remove/819298",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          2880
+        ],
+        "id": "997fbf98-ecab-416f-baa1-38896c523034",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "=905984"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1552,
+          4000
+        ],
+        "id": "cdf37565-4b65-4ff9-87d8-45addd9dcd4e",
+        "name": "Redis2",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://api.kynex.trade:7000/api/token/latest",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "x-Admin ",
+                "value": "JKG*jCnTYv|V{lq'+?5no3{+nnCEDVd74)[=&'Mi7,zhM8m)P:e)>l2tD+XCrDX9"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          4448
+        ],
+        "id": "69a21685-15de-4ab6-b210-743824234ebf",
+        "name": "HTTP Request3"
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "bearerProductionPositions",
+          "value": "={{ $json.token }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1552,
+          4672
+        ],
+        "id": "f79eb3c7-69d3-4cc6-aff2-df89747157f8",
+        "name": "Redis5",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://api.kynex.trade:7100/api/positions_history/{{ $(\"Code in JavaScript\").item.json.login }}/{{ $(\"Code in JavaScript\").item.json.positions[0].time_create }}&per_page=1",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.bearerToken }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          3776
+        ],
+        "id": "217cf38b-b6dc-4598-b787-7fc59042533e",
+        "name": "HTTP Request4"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "=905984"
+              },
+              {
+                "name": "action",
+                "value": "=close"
+              },
+              {
+                "name": "symbol",
+                "value": "=BullX500."
+              },
+              {
+                "name": "volume",
+                "value": "=0.3"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          3328
+        ],
+        "id": "98277a72-a4f2-4227-9cd2-18dd70bb6b49",
+        "name": "HTTP Request6"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "open",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9076f988-7186-4c98-93c0-fe4a64d05c04"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageOpenWS"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "47f769b3-eda0-494b-abce-b92097ff6b5a",
+                      "leftValue": "={{ $json.event }}",
+                      "rightValue": "message",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "messageWS"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -1328,
+          832
+        ],
+        "id": "cdf96c40-9bee-4a5f-be18-bd8bf54b0167",
+        "name": "Switch4"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "loginsMarcadosProduccion",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1104,
+          1024
+        ],
+        "id": "84ccf02d-2c02-4772-aa1d-b405ba1444e5",
+        "name": "loginsMarcadosProduccion2",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const data = $('Switch4').first().json.message;\nconst accounts = data.accounts;\n\nconst rawMarcados = $('loginsMarcadosProduccion2').first().json.propertyName;\nconst listaLogins = JSON.parse(rawMarcados).map(l => String(l));\n\nconst removedLogins = (data.removed_logins ?? []).map(l => String(l));\n\n// Snapshot de Redis — todas las keys pos:login:position_id activas\nconst rawSnapshot = $('Redis_Snapshot').first().json;\nconst redisKeys = Object.keys(rawSnapshot).filter(k => k.startsWith('pos:'));\n\nconst symbolsAllowed = [\n  \"BearX1000.\",\"BearX400.\",\"BearX500.\",\"BearX777.\",\"BearX900.\",\n  \"BullX1000.\",\"BullX400.\",\"BullX500.\",\"BullX777.\",\"BullX900.\",\n  \"EmasVol10\",\"EmasVol100\",\"EmasVol20\",\"EmasVol30\",\"EmasVol40\",\n  \"EmasVol50\",\"EmasVol60\",\"EmasVol70\",\"EmasVol80\",\"EmasVol90\",\n  \"FomoX111.\",\"FomoX333.\",\"FomoX555.\",\"FomoX888.\",\"FomoX999.\",\n  \"FomoXpeed100.\",\"Fortune100.\",\"Fortune1000.\",\"Fortune250.\",\n  \"Fortune500.\",\"FortuneX200.\",\"FortuneX300.\",\"FortuneX500.\",\n  \"LionX100\",\"LionX120\",\"LionX150\",\"LionX200\",\"LionX25\",\n  \"LionX40\",\"LionX50\",\"LionX60\",\"LionX75\",\"LionX90\",\n  \"VorteX100.\",\"VorteX20.\",\"VorteX40.\",\"VorteX60.\",\"VorteX80.\",\n  \"XpeedDown200\",\"XpeedDown300\",\"XpeedUp200\",\"XpeedUp300\"\n];\n\nconst VENTANA_SEGUNDOS = 15;\nconst ahoraEnSegundos = Math.floor(data.timestamp_msc / 1000);\n\n// ── OPEN ──────────────────────────────────────────────────────────────────────\nconst cuentasMarcadas = accounts\n  .filter(account => listaLogins.includes(String(account.login)))\n  .flatMap(account => {\n    const positionsFiltradas = (account.positions ?? []).filter(position => {\n      const diff = ahoraEnSegundos - position.time_create;\n      return diff >= 0 && diff <= VENTANA_SEGUNDOS && symbolsAllowed.includes(position.symbol);\n    });\n    return positionsFiltradas.map(position => ({\n      json: {\n        login: String(account.login),\n        name: account.name,\n        estado: \"OPEN\",\n        direccion: position.action,\n        position_id: position.ticket,\n        symbol: position.symbol,\n        volume: position.volume,\n        time_create: position.time_create\n      }\n    }));\n  });\n\n// ── CLOSE por removed_logins ──────────────────────────────────────────────────\nconst cuentasEliminadas = removedLogins\n  .filter(login => listaLogins.includes(login))\n  .map(login => ({\n    json: { login, estado: \"CLOSE\" }\n  }));\n\n// ── CLOSE parcial — posición desapareció del WS pero login sigue activo ───────\n// Set de todas las posiciones activas en este mensaje: \"pos:login:position_id\"\nconst posicionesActivasEnWS = new Set(\n  accounts\n    .filter(account => listaLogins.includes(String(account.login)))\n    .flatMap(account =>\n      (account.positions ?? []).map(p =>\n        \"pos:\" + String(account.login) + \":\" + String(p.ticket)\n      )\n    )\n);\n\nconst cierresParciales = redisKeys\n  .filter(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    // El login sigue en el WS (no está en removed_logins)\n    // pero esta posición específica ya no aparece en su array positions\n    const loginSigueEnWS = accounts.some(a => String(a.login) === loginDeKey);\n    const loginEstaEnRemoved = removedLogins.includes(loginDeKey);\n    return loginSigueEnWS && !loginEstaEnRemoved && !posicionesActivasEnWS.has(key);\n  })\n  .map(key => {\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    return {\n      json: {\n        login: loginDeKey,\n        estado: \"CLOSE\"\n      }\n    };\n  });\n\nreturn [...cuentasMarcadas, ...cuentasEliminadas, ...cierresParciales];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -656,
+          1024
+        ],
+        "id": "d9e1e6c8-67ef-449b-bb2d-17e416dfdcf0",
+        "name": "Code in JavaScript3"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.estado }}",
+                      "rightValue": "OPEN",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "9314909a-6079-4190-87c5-aa2e2ddf685b"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "OPEN"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "a2cda040-6229-443a-9c3e-7ad0a779bfac",
+                      "leftValue": "={{ $json.estado }}",
+                      "rightValue": "CLOSE",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "CLOSE"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          -432,
+          1024
+        ],
+        "id": "8030b0e2-53a5-498e-bac1-71840fc090ce",
+        "name": "Switch3"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "=propertyName",
+          "key": "={{\"pos:\"+ $json.login + \":\" + $json.position_id }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -208,
+          928
+        ],
+        "id": "638e258c-9b7a-46d8-af71-2958c442d039",
+        "name": "Redis_ReadOpen",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Code_DedupOpen — versión final correcta\nconst redisResult = $input.all(); // array de items, uno por posición\n\nreturn redisResult\n  .map((redisItem, index) => {\n    const propertyName = redisItem.json.propertyName ?? null;\n    \n    // Si ya existe en Redis → duplicado, ignorar este item\n    if (propertyName) return null;\n    \n    // Recuperar el item original del Switch3 por índice\n    const originalItem = $('Switch3').all()[index]?.json;\n    if (!originalItem) return null;\n    \n    return { json: { ...originalItem } };\n  })\n  .filter(item => item !== null);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          16,
+          928
+        ],
+        "id": "8f90d8aa-c193-42ae-b476-9a1947715193",
+        "name": "Code_DedupOpen"
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "=pos:{{ $json.login }}:{{ $json.position_id }}",
+          "value": "={{ JSON.stringify({ position_id: $json.position_id, unix_stamp: $json.time_create, login: $json.login, symbol: $json.symbol }) }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          240,
+          928
+        ],
+        "id": "07b64667-9ccc-46b0-b9bb-40af43b6c8f5",
+        "name": "Redis11",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "={{ $json.login }}"
+              },
+              {
+                "name": "action",
+                "value": "open"
+              },
+              {
+                "name": "symbol",
+                "value": "={{ $json.symbol }}"
+              },
+              {
+                "name": "volume",
+                "value": "={{ $json.volume }}"
+              },
+              {
+                "name": "direction",
+                "value": "={{ $json.direccion }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          464,
+          1024
+        ],
+        "id": "447e4fc9-9570-4ccf-a072-996af0126d66",
+        "name": "HTTP_AlertOpen"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Toma los CLOSE que vienen del Switch3\nconst closeItems = $input.all();\n\n// Reutiliza el snapshot que ya se leyó al inicio\nconst rawSnapshot = $('Redis_Snapshot').first().json;\n\n// Agrupa por login usando solo los logins en CLOSE\nconst byLogin = {};\n\nfor (const item of closeItems) {\n  const loginCierre = String(item.json.login);\n\n  // Filtrar el snapshot por este login\n  for (const [key, rawValue] of Object.entries(rawSnapshot)) {\n    if (!key.startsWith('pos:')) continue;\n\n    const parts = key.split(':');\n    const loginDeKey = parts[1];\n    if (loginDeKey !== loginCierre) continue;\n\n    const redisData = JSON.parse(rawValue);\n\n    if (!byLogin[loginCierre]) {\n      byLogin[loginCierre] = {\n        login: loginCierre,\n        unix_stamp: redisData.unix_stamp,\n        positions: []\n      };\n    } else if (redisData.unix_stamp < byLogin[loginCierre].unix_stamp) {\n      byLogin[loginCierre].unix_stamp = redisData.unix_stamp;\n    }\n\n    byLogin[loginCierre].positions.push({\n      key,\n      position_id: String(redisData.position_id),\n      symbol: redisData.symbol\n    });\n  }\n}\n\nreturn Object.values(byLogin).map(entry => ({ json: entry }));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          16,
+          1216
+        ],
+        "id": "a12b2c94-5479-45db-b15c-34444eadc747",
+        "name": "Code in JavaScript5",
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "bearerToken",
+          "key": "bearerProductionPositions",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          240,
+          1216
+        ],
+        "id": "97f2b6ae-2d0f-4916-97fc-3aa108a5a9c3",
+        "name": "Redis_Bearer1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.bearerToken }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          688,
+          1216
+        ],
+        "id": "2e08d909-1d19-4cbb-8293-ae15480c2cbb",
+        "name": "openedOrders3"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript6').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const { login, positions } = prev;\n\n  // Para cada posición que mandamos a verificar, buscar en la respuesta\n  return positions.flatMap(pos => {\n    const order = orders.find(o => String(o.position_id) === String(pos.position_id));\n\n    // No encontrada o sigue abierta → ignorar\n    if (!order) return [];\n    if (order.time_close === 0 || order.time_close === null) return [];\n\n    return [{\n      json: {\n        login,\n        position_id:   String(pos.position_id),\n        symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? pos.symbol,\n        volume:        order.deal_internal_out?.lots ?? order.lots,\n        estado_cierre: \"CONFIRMADO\",\n        key:           pos.key\n      }\n    }];\n  });\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          1216
+        ],
+        "id": "7827ee15-540f-45cd-9b18-ec903d9c5009",
+        "name": "Code_VerifyClose1"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $json.key }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          1136,
+          1120
+        ],
+        "id": "060564a1-a900-41fa-9e6a-ddc6f1575bee",
+        "name": "Redis_DeleteClose1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Code in JavaScript6 — merge bearer con el grupo agrupado por login\nconst allBearer = $input.all();\nconst allPrev = $('Code in JavaScript5').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:      prev.login,\n      unix_stamp: prev.unix_stamp,\n      positions:  prev.positions,   // ← array completo de posiciones del login\n      bearerToken\n    }\n  };\n}).filter(Boolean);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          464,
+          1216
+        ],
+        "id": "9b01d5e5-424d-4e05-989b-b75e69dc3c2c",
+        "name": "Code in JavaScript6"
+      },
+      {
+        "parameters": {
+          "operation": "set",
+          "key": "bearerProductionPositions",
+          "value": "={{ $json.bearerToken }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1104,
+          640
+        ],
+        "id": "aed77c6a-e140-4e3b-a975-ef535c9b44fa",
+        "name": "Redis14",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "-1003734325193",
+          "text": "=🔴 *LOGIN MARCADO - APERTURA*\n👤 {{ $json.name }} ({{ $json.login }})\n📈 Symbol: {{ $json.symbol }}\n📊 Volumen: {{ $json.volume }}\n🎫 Ticket: {{ $json.position_id }}\n🕐 unix: {{ $json.time_create }}\n🕐 {{ $now }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          464,
+          832
+        ],
+        "id": "6494c990-bf47-4eea-b833-fbf23612f71e",
+        "name": "Telegram Apertura",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 1000,
+        "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "chatId": "-1003734325193",
+          "text": "=🔴 *LOGIN MARCADO - CIERRE*\nlogin : {{ $json.login }}\nticket : {{ $json.position_id }}\nsymbol : {{ $json.symbol }}\n🕐 {{ $now }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "Markdown"
+          }
+        },
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "position": [
+          1136,
+          1312
+        ],
+        "id": "850b2985-16a4-4cc4-ad7f-2ba797c339a3",
+        "name": "Telegram Apertura1",
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 1000,
+        "webhookId": "127c842b-d14b-46eb-b4f9-283f138d59ef",
+        "credentials": {
+          "telegramApi": {
+            "id": "FKAlkkTj2ZrArlQ1",
+            "name": "Telegram account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "keys",
+          "keyPattern": "pos:*:*"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -880,
+          1024
+        ],
+        "id": "3c33df5f-63af-4a6b-b97a-a15084f72819",
+        "name": "Redis_Snapshot",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "keys",
+          "keyPattern": "pos:*:*"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1552,
+          1984
+        ],
+        "id": "e284d05e-73a6-4c1d-b778-201739c8f1ed",
+        "name": "Redis_Snapshot1",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $json.key }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1024,
+          1872
+        ],
+        "id": "479f8168-c948-4847-b444-097022410c96",
+        "name": "Redis_Snapshot2",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "=893149"
+              },
+              {
+                "name": "action",
+                "value": "open"
+              },
+              {
+                "name": "symbol",
+                "value": "=BullX900."
+              },
+              {
+                "name": "volume",
+                "value": "=0.1"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          1760
+        ],
+        "id": "6b1490fe-9a80-499e-af47-b12e477ee144",
+        "name": "HTTP_AlertOpen1"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "=893149"
+              },
+              {
+                "name": "action",
+                "value": "close"
+              },
+              {
+                "name": "symbol",
+                "value": "=BullX900."
+              },
+              {
+                "name": "volume",
+                "value": "=0.1"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          3104
+        ],
+        "id": "33908f04-75db-4ed9-b3bf-b8fb58692368",
+        "name": "HTTP_AlertClose"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "key": "bearerProductionPositions",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1552,
+          4224
+        ],
+        "id": "074399c0-8ed9-4f11-9998-79084ca5886c",
+        "name": "Redis",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "c0sV2K39sM9bBvYc",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/c0sV2K39sM9bBvYc",
+            "cachedResultName": "whiteListWorkflow"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "message_firstItem": "={{ $('Switch4').first().json.message }}"
+            },
+            "matchingColumns": [
+              "message_firstItem"
+            ],
+            "schema": [
+              {
+                "id": "message_firstItem",
+                "displayName": "message_firstItem",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {
+            "waitForSubWorkflow": false
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          -944,
+          816
+        ],
+        "name": "Call whiteListWorkflow",
+        "id": "81c66430-a8f5-4ce6-8180-d43effe1d204"
+      },
+      {
+        "parameters": {
+          "operation": "keys",
+          "keyPattern": "={{ \"pos:\" + \"*\" + \":*\"}}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1552,
+          2208
+        ],
+        "id": "dde6a957-c3cc-457e-8994-5ae21453538d",
+        "name": "Redis_ReadClose",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const keysObj = $input.first().json;\n\nconst redisKeys = Object.keys(keysObj).filter(k => k.startsWith('pos:'));\nif (redisKeys.length === 0) return [];\n\nreturn redisKeys.map(key => {\n  const parts = key.split(':'); // [\"pos\", \"905984\", \"119133921\"]\n  const login = parts[1];\n  const position_id = parts[2];\n  const redisData = JSON.parse(keysObj[key]);\n  return {\n    json: {\n      login: redisData.login ?? String(login),\n      key,\n      position_id: String(position_id),\n      unix_stamp: redisData.unix_stamp,\n      symbol: redisData.symbol\n    }\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1328,
+          2208
+        ],
+        "id": "c69e6b16-d81c-41cc-a3d6-1ec69b35750d",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "propertyName": "bearerToken",
+          "key": "bearerProductionPositions",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -1104,
+          2208
+        ],
+        "id": "43588fff-f4ba-4810-9692-7a75b849e6bc",
+        "name": "Redis_Bearer",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://api.kynex.trade:7000/api/opened_orders?logins={{ $json.login }}&from={{ $json.unix_stamp }}&include_closed=true&per_page=100",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Authorization",
+                "value": "=Bearer {{ $json.bearerToken }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -656,
+          2208
+        ],
+        "id": "b6584b45-1318-4b5f-9a7a-861039cbb537",
+        "name": "openedOrders"
+      },
+      {
+        "parameters": {
+          "jsCode": "const allResponses = $input.all();\nconst allPrev = $('Code in JavaScript7').all();\n\nreturn allResponses.flatMap((responseItem, index) => {\n  const orders = responseItem.json.orders ?? [];\n  const prev = allPrev[index]?.json;\n  if (!prev) return [];\n\n  const positionIdEsperado = String(prev.position_id);\n  const login  = prev.login;\n  const symbol = prev.symbol;\n  const key    = prev.key;\n\n  if (!positionIdEsperado) return [];\n\n  const order = orders.find(o => String(o.position_id) === positionIdEsperado);\n  if (!order) return [];\n  if (order.time_close === 0 || order.time_close === null) return [];\n\n  return [{\n    json: {\n      login,\n      position_id:   positionIdEsperado,\n      symbol:        order.deal_internal_out?.symbol ?? order.symbol ?? symbol,\n      volume:        order.deal_internal_out?.lots ?? order.lots,\n      estado_cierre: \"CONFIRMADO\",\n      key\n    }\n  }];\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -432,
+          2208
+        ],
+        "id": "6d5c8b40-561f-4213-aad7-5fcc61b591ca",
+        "name": "Code_VerifyClose"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Code in JavaScript7 — corregido para múltiples items\nconst allBearer = $input.all();\nconst allPrev = $('Code in JavaScript').all();\n\nreturn allBearer.map((bearerItem, index) => {\n  const bearerToken = bearerItem.json.bearerToken;\n  const prev = allPrev[index]?.json;\n  if (!prev) return null;\n  return {\n    json: {\n      login:       prev.login,\n      key:         prev.key,\n      position_id: prev.position_id,\n      unix_stamp:  prev.unix_stamp,\n      symbol:      prev.symbol,\n      bearerToken\n    }\n  };\n}).filter(item => item !== null);"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -880,
+          2208
+        ],
+        "id": "2a446173-6244-487f-9ed2-4b384211befc",
+        "name": "Code in JavaScript7"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "={{ $json.login }}"
+              },
+              {
+                "name": "action",
+                "value": "close"
+              },
+              {
+                "name": "symbol",
+                "value": "={{ $json.symbol }}"
+              },
+              {
+                "name": "volume",
+                "value": "={{ $json.volume }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          16,
+          2208
+        ],
+        "id": "ea09737a-5f4d-48b4-906e-fc857e593fc9",
+        "name": "HTTP_AlertClose2"
+      },
+      {
+        "parameters": {
+          "operation": "delete",
+          "key": "={{ $json.key }}"
+        },
+        "type": "n8n-nodes-base.redis",
+        "typeVersion": 1,
+        "position": [
+          -208,
+          2208
+        ],
+        "id": "0c714496-ea8b-41d7-9948-20d6ea566252",
+        "name": "Redis_DeleteClose",
+        "credentials": {
+          "redis": {
+            "id": "FmIJ14WSiatNaRQJ",
+            "name": "Redis account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8010/api/webhook/blacklist-alert",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "=896326"
+              },
+              {
+                "name": "action",
+                "value": "close"
+              },
+              {
+                "name": "symbol",
+                "value": "=BearX400."
+              },
+              {
+                "name": "volume",
+                "value": "=0.1"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -1552,
+          2432
+        ],
+        "id": "405c62da-79b7-43bf-ad61-6c3f25312051",
+        "name": "HTTP_AlertClose3"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://188.245.125.1:8020/api/webhook/blacklist-alert",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "account_id",
+                "value": "={{ $json.login }}"
+              },
+              {
+                "name": "action",
+                "value": "close"
+              },
+              {
+                "name": "symbol",
+                "value": "={{ $json.symbol }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          1360,
+          1120
+        ],
+        "id": "f6496474-2526-4214-8422-9e1213f1113b",
+        "name": "HTTP_AlertClose4",
+        "retryOnFail": true,
+        "maxTries": 2,
+        "onError": "continueRegularOutput"
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nconst seen = new Set();\n\nreturn items.filter(item => {\n  const login = String(item.json.login);\n  if (seen.has(login)) return false;\n  seen.add(login);\n  return true;\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -208,
+          1216
+        ],
+        "id": "a2c3417f-4b0d-4664-9956-cc2f36550dde",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Asumiendo que el objeto completo viene en el primer item\nconst data = $input.first().json;\n\nreturn Object.keys(data).map(key => {\n  return { json: { key } };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1392,
+          2000
+        ],
+        "id": "8290ce4b-2c43-4187-aba2-1123c7ffdb25",
+        "name": "Code in JavaScript2"
+      },
+      {
+        "parameters": {
+          "batchSize": 500,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          -1248,
+          1872
+        ],
+        "id": "db5d5be7-79e8-4e6c-969c-d25713f9a053",
+        "name": "Loop Over Items"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          -816,
+          1872
+        ],
+        "id": "b89133c2-4d54-49a5-92b6-d92b4fcc609d",
+        "name": "Wait",
+        "webhookId": "0dd61257-d91b-4152-80f2-9032256f3985"
+      },
+      {
+        "parameters": {
+          "websocketUrl": "wss://api.kynex.trade:7000/ws/profit_update?groups=*&poll_interval_ms=5000",
+          "tokenRefreshEnabled": true,
+          "tokenRefreshMode": "twoStep",
+          "tsStep1Url": "=https://api.kynex.trade:7000/api/token/latest",
+          "tsStep1AdminHeaderValue": "=JKG*jCnTYv|V{lq'+?5no3{+nnCEDVd74)[=&'Mi7,zhM8m)P:e)>l2tD+XCrDX9",
+          "tsStep1ResponsePath": "token",
+          "tsStep2Url": "=https://api.kynex.trade:7000/api/token/refresh",
+          "tsStep2ResponsePath": "=bearer_token",
+          "tokenRefreshTargetParam": "token",
+          "tokenRefreshValuePrefix": "",
+          "tokenRefreshIntervalHours": 14,
+          "maxReconnectAttempts": 3
+        },
+        "type": "n8n-nodes-websocket-ws-prueba.websocketReconnectTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1600,
+          816
+        ],
+        "id": "7c1b2d06-d838-4cb9-b39f-f325740f3bf1",
+        "name": "WebSocket Kynex Trigger1"
+      }
+    ],
+    "connections": {
+      "getListasMarcadas": {
+        "main": [
+          []
+        ]
+      },
+      "HTTP Request3": {
+        "main": [
+          []
+        ]
+      },
+      "Switch4": {
+        "main": [
+          [
+            {
+              "node": "Redis14",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "loginsMarcadosProduccion2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Call whiteListWorkflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "loginsMarcadosProduccion2": {
+        "main": [
+          [
+            {
+              "node": "Redis_Snapshot",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript3": {
+        "main": [
+          [
+            {
+              "node": "Switch3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch3": {
+        "main": [
+          [
+            {
+              "node": "Redis_ReadOpen",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_ReadOpen": {
+        "main": [
+          [
+            {
+              "node": "Code_DedupOpen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code_DedupOpen": {
+        "main": [
+          [
+            {
+              "node": "Redis11",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis11": {
+        "main": [
+          [
+            {
+              "node": "Telegram Apertura",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "HTTP_AlertOpen",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript5": {
+        "main": [
+          [
+            {
+              "node": "Redis_Bearer1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Bearer1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript6",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "openedOrders3": {
+        "main": [
+          [
+            {
+              "node": "Code_VerifyClose1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code_VerifyClose1": {
+        "main": [
+          [
+            {
+              "node": "Redis_DeleteClose1",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Telegram Apertura1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_DeleteClose1": {
+        "main": [
+          [
+            {
+              "node": "HTTP_AlertClose4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript6": {
+        "main": [
+          [
+            {
+              "node": "openedOrders3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Snapshot": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Snapshot1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP_AlertOpen": {
+        "main": [
+          []
+        ]
+      },
+      "Redis_ReadClose": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Redis_Bearer",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Bearer": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript7",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "openedOrders": {
+        "main": [
+          [
+            {
+              "node": "Code_VerifyClose",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript7": {
+        "main": [
+          [
+            {
+              "node": "openedOrders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code_VerifyClose": {
+        "main": [
+          [
+            {
+              "node": "Redis_DeleteClose",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Apertura1": {
+        "main": [
+          []
+        ]
+      },
+      "Redis_DeleteClose": {
+        "main": [
+          [
+            {
+              "node": "HTTP_AlertClose2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript2": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Loop Over Items": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Redis_Snapshot2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Redis_Snapshot2": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Loop Over Items",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "WebSocket Kynex Trigger1": {
+        "main": [
+          [
+            {
+              "node": "Switch4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "nodeGroups": [],
+    "authors": "Broke Os",
+    "name": "Version 68bed570",
+    "description": "",
+    "autosaved": false
+  },
+  "tags": []
+}
