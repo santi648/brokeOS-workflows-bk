@@ -1,0 +1,32 @@
+{
+  "updatedAt": "2026-06-10T05:13:40.941Z",
+  "createdAt": "2026-06-10T04:37:03.287Z",
+  "id": "T7UvQBcQtRVhWqUk",
+  "name": "errorTriggerMarketing",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": null,
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "9b637585-408b-46a3-a0c8-e04cd1cebfee",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-10T04:37:03.287Z",
+      "createdAt": "2026-06-10T04:37:03.287Z",
+      "role": "workflow:owner",
+      "workflowId": "T7UvQBcQtRVhWqUk",
+      "projectId": "YlWHwxOGxcFi2H90"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
